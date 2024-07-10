@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
         "Anpole",
+        "cockroachdb",
+        "dbgenerated",
         "nextjs",
-        "openai"
+        "openai",
+        "prismadb"
     ]
 }
