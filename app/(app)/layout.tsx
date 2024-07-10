@@ -1,3 +1,4 @@
+"use client"
 import Navbar from "@/components/Navbar";
 import { UserThread } from "@prisma/client";
 import axios from "axios";
@@ -10,8 +11,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // const [assistant, setAssistant] = useAtom(assistantAtom);
 
   // State
-  const [isNotificationModalVisible, setIsNotificationModalVisible] =
-    useState(false);
+  // const [isNotificationModalVisible, setIsNotificationModalVisible] =
+  //   useState(false);
 
   useEffect(() => {
     async function getUserThread() {

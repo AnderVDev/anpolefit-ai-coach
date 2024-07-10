@@ -36,6 +36,7 @@ function Navbar() {
         ))}
 
         <UserButton />
+        {/* <UserButton fallbackRedirectUrl="/"/> */}
         {/* <UserButton afterSignOutUrl="" /> */}
       </div>
     </div>
