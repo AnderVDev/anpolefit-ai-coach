@@ -10,6 +10,10 @@ const routes = [
     path: "/",
   },
   {
+    name: "Calculator",
+    path: "/calculator",
+  },
+  {
     name: "Profile",
     path: "/profile",
   },
