@@ -19,9 +19,9 @@ export async function POST(req: Request) {
     const threadMessage = await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: message,
-    //   metadata: {
-    //     fromUser,
-    //   },
+      metadata: {
+        fromUser,
+      },
     });
 
     console.log("from openai", threadMessage);

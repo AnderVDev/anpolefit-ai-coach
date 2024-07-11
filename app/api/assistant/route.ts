@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const assistants = await prismadb.assistant.findMany();
 
-  console.log(assistants);
+//   console.log(assistants);
 
   if (assistants.length === 0) {
     return NextResponse.json(
