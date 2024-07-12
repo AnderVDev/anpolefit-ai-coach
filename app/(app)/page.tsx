@@ -197,7 +197,7 @@ function ChatPage() {
   };
 
   return (
-    <div className="w-screen h-[calc(100vh-64px)] flex flex-col bg-black text-white">
+    <div className="w-screen h-[calc(100vh-64px)] flex flex-col text-white">
       {/* MESSAGES */}
       <div className="flex-grow overflow-y-scroll p-8 space-y-2">
         {/* 1. FETCHING MESSAGES */}
@@ -212,12 +212,12 @@ function ChatPage() {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`px-4 py-2 mb-3 rounded-lg w-fit text-lg ${
+            className={`px-4 py-2 mb-3 rounded-lg w-fit text-sm ${
               ["true", "True"].includes(
                 (message.metadata as { fromUser?: string }).fromUser ?? ""
               )
-                ? "bg-yellow-500 ml-auto"
-                : "bg-gray-700"
+                ? "bg-secondary-500 ml-auto"
+                : "bg-gray-100"
             }`}
           >
             {message.content[0].type === "text"
@@ -235,11 +235,11 @@ function ChatPage() {
       </div>
 
       {/* INPUT */}
-      <div className="mt-auto p-4 bg-gray-800">
-        <div className="flex items-center bg-white p-2">
+      <div className="mt-auto p-4 ">
+        <div className="flex items-center bg-gray-100 rounded-lg p-2">
           <input
             type="text"
-            className="flex-grow bg-transparent text-black focus:outline-none"
+            className="flex-grow bg-transparent  focus:outline-none placeholder:text-gray-20"
             placeholder="Type a message..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -248,7 +248,7 @@ function ChatPage() {
             disabled={
               !userThread?.threadId || !assistant || sending || !message.trim()
             }
-            className="ml-4 bg-yellow-500 text-white px-4 py-2 rounded-full focus:outline-none disabled:bg-yellow-700"
+            className="ml-4 bg-primary-500 text-gray-20 px-4 py-2 rounded-full focus:outline-none disabled:bg-secondary-500 disabled:text-gray-500"
             onClick={sendMessage}
           >
             {sending ? "Sending..." : pollingRun ? "Polling Run..." : "Send"}

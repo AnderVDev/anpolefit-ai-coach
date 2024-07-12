@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card } from "./ui/card";
+import { Card, CardContent, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Counter } from "./Counter";
 import Metrics from "./Metrics";
@@ -8,7 +8,7 @@ import OptionsCard from "./OptionsCard";
 import { Beef, Wheat, Nut } from "lucide-react";
 
 const cardStyle =
-  "flex flex-col p-4 border border-gray-200 rounded-lg cursor-pointer items-center";
+  "flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center";
 
 const genders = [
   {
@@ -124,34 +124,44 @@ function StepContent({ step }: StepContentProp) {
       {step === 1 && (
         <Card className="flex flex-grow flex-col p-4 border border-gray-200 rounded-lg cursor-pointer">
           <div className="grid grid-col-1 md:grid-cols-2 gap-4 m-4">
+            {/* Gender */}
             <Card className={`${cardStyle}`}>
-              <h2>Gender</h2>
-              <div className="flex gap-4">
+              <CardTitle>Gender</CardTitle>
+              <CardContent>
                 {genders.map((gender) => (
                   <Button key={gender.id} className="text-sm m-4">
                     {gender.gender}
                   </Button>
                 ))}
-              </div>
+              </CardContent>
             </Card>
 
+            {/* Age */}
             <Card className={`${cardStyle}`}>
-              <h2>Age</h2>
-              <Counter
-                minLevel={10}
-                maxLevel={150}
-                steps={1}
-                initialValue={18}
-                label={"years old"}
-              />
+              <CardTitle>Age</CardTitle>
+              <CardContent>
+                <Counter
+                  minLevel={10}
+                  maxLevel={150}
+                  steps={1}
+                  initialValue={18}
+                  label={"years old"}
+                />
+              </CardContent>
             </Card>
           </div>
+
+          {/* metrics */}
           <Card className="flex flex-col p-4 border border-gray-200 rounded-lg cursor-pointer items-center m-4">
-            <Metrics />
+            <CardContent>
+              <Metrics />
+            </CardContent>
           </Card>
+
+          {/* activity */}
           <Card className="flex flex-col p-4 border border-gray-200 rounded-lg cursor-pointer items-center m-4">
-            <h2 className="font-bold text-xl">How Active Are You?</h2>
-            <div className="grid grid-col-1 md:grid-cols-2 gap-4">
+            <CardTitle className="mb-2">How Active Are You?</CardTitle>
+            <CardContent className="grid grid-col-1 md:grid-cols-2 gap-4">
               {activities.map((activity) => (
                 <ActivityCard
                   key={activity.id}
@@ -164,8 +174,10 @@ function StepContent({ step }: StepContentProp) {
                   }}
                 />
               ))}
-            </div>
+            </CardContent>
           </Card>
+
+
         </Card>
       )}
       {step === 2 && (
@@ -213,10 +225,10 @@ function StepContent({ step }: StepContentProp) {
               <p>result</p>
             </div>
 
-            <div>
-              <h2>Carbohydrates</h2>
-              <div className="w-10 h-10 flex items-center justify-center z-10 relative bg-slate-500 rounded-full">
-                <Wheat color="white" size={24}/>
+            <div className="mb-4 flex justify-center flex-col items-center">
+              <h2 className="text-primary-500">Carbohydrates</h2>
+              <div className="border-2 border-gray-100 bg-primary-100 rounded-full p-2">
+                <Wheat color="#5E0000" size={24} />
               </div>
               <p>result</p>
             </div>
@@ -224,7 +236,7 @@ function StepContent({ step }: StepContentProp) {
             <div>
               <h2>Fat</h2>
               <div className="w-10 h-10 flex items-center justify-center z-10 relative bg-slate-500 rounded-full">
-                <Nut color="white" size={24}/>
+                <Nut color="white" size={24} />
               </div>
               <p>result</p>
             </div>

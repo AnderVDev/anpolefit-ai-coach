@@ -19,10 +19,20 @@ const config = {
     },
     extend: {
       colors: {
+        "gray-20": "#F8F4EB",
+        "gray-50": "#EFE6E6",
+        "gray-100": "#DFCCCC",
+        "gray-500": "#5E0000",
+        "primary-100": "#FFE1E0",
+        "primary-300": "#FFA6A3",
+        "primary-500": "#FF6B66",
+        "secondary-400": "#FFCD5B",
+        "secondary-500": "#FFC132",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: "#F8F4EB",
+        // background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -53,6 +63,10 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      fontFamily: {
+        dmsans: ["DM Sans", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -73,6 +87,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+    
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config

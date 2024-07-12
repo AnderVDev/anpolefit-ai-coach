@@ -22,22 +22,22 @@ const Stepper = () => {
             {i !== 0 && (
               <div
                 className={`absolute w-full h-[3px] right-2/4 top-1/3 -translate-y-2/4 ${
-                  i + 1 < currentStep || complete ? "bg-green-600" : "bg-slate-200"
+                  i + 1 < currentStep || complete ? "bg-primary-500" : "bg-gray-100"
                 }`}
               />
             )}
             <div
-              className={`w-10 h-10 flex items-center justify-center z-10 relative rounded-full font-semibold text-white ${
+              className={`w-10 h-10 flex items-center justify-center z-10 relative rounded-full font-semibold text-gray-20  ${
                 i + 1 < currentStep || complete
-                  ? "bg-green-600"
+                  ? "bg-primary-500"
                   : currentStep === i + 1
-                  ? "bg-sky-600"
-                  : "bg-slate-700"
+                  ? "bg-gray-500"
+                  : "bg-gray-100"
               }`}
             >
               {i + 1 < currentStep || complete ? <Check size={24} /> : i + 1}
             </div>
-            <p className={i + 1 < currentStep || complete ? "text-white" : "text-gray-500"}>{step}</p>
+            <p >{step}</p>
           </div>
         ))}
       </div>

@@ -22,17 +22,17 @@ const routes = [
 function Navbar() {
   const pathname = usePathname();
   return (
-    <div className="p-4 flex flex-row justify-between items-center bg-black text-white">
+    <div className="p-4 flex flex-row justify-between items-center b text-white">
       <Link href="/">
-        <h1 className="text-2xl font-bold">AnpoleFit AI</h1>
+        <h1 className="text-xl font-bold">AnpoleFit AI</h1>
       </Link>
-      <div className="flex gap-x-6 text-lg items-center">
+      <div className="flex gap-x-6 text-sm items-center">
         {routes.map((route, idx) => (
           <Link
             key={idx}
             href={route.path}
             className={
-              pathname === route.path ? "border-b-2 border-yellow-500" : ""
+              pathname === route.path ? "border-b-2 border-secondary-500" : ""
             }
           >
             {route.name}
