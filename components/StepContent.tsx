@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { Counter } from "./Counter";
 import Metrics from "./Metrics";
 import ActivityCard from "./ActivityCard";
 import OptionsCard from "./OptionsCard";
-import { Beef, Wheat, Nut } from "lucide-react";
+import { Beef, Wheat, Nut, UserRound } from "lucide-react";
+import GenderCard from "./GenderCard";
+import CaloricIntakeCard from "./CaloricIntakeCard";
 
 const cardStyle =
   "flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center";
@@ -14,12 +15,15 @@ const genders = [
   {
     id: "MALE",
     gender: "Male",
+    icon: <UserRound />,
   },
   {
     id: "FEMALE",
     gender: "Female",
+    icon: <UserRound />,
   },
 ];
+type GendersTypes = "MALE" | "FEMALE";
 
 const activities = [
   {
@@ -100,7 +104,32 @@ interface StepContentProp {
   step: number;
 }
 
+const caloricIntakes = [
+  {
+    id: "PROTEIN",
+    name: "Protein",
+    icon: <Beef />,
+    result: 700,
+  },
+  {
+    id: "CARBOHYDRATES",
+    name: "Carbohydrates",
+    icon: <Wheat />,
+    result: 450,
+  },
+  {
+    id: "FAT",
+    name: "Fat",
+    icon: <Nut />,
+    result: 450,
+  },
+];
+
 function StepContent({ step }: StepContentProp) {
+  // states
+  const [selectedGender, setSelectedGender] = useState<GendersTypes | null>(
+    null
+  );
   const [selectedActivity, setSelectedActivity] = useState<Activities | null>(
     null
   );
@@ -110,6 +139,9 @@ function StepContent({ step }: StepContentProp) {
     null
   );
 
+  const handleSelectGender = (genderId: GendersTypes) => {
+    setSelectedGender(genderId);
+  };
   const handleSelectActivity = (activityId: Activities) => {
     setSelectedActivity(activityId);
   };
@@ -122,16 +154,22 @@ function StepContent({ step }: StepContentProp) {
   return (
     <div>
       {step === 1 && (
-        <Card className="flex flex-grow flex-col p-4 border border-gray-200 rounded-lg cursor-pointer">
+        <Card className="flex flex-grow flex-col p-4 border border-gray-200 rounded-lg ">
           <div className="grid grid-col-1 md:grid-cols-2 gap-4 m-4">
             {/* Gender */}
             <Card className={`${cardStyle}`}>
               <CardTitle>Gender</CardTitle>
-              <CardContent>
+              <CardContent className="flex gap-4 m-4">
                 {genders.map((gender) => (
-                  <Button key={gender.id} className="text-sm m-4">
-                    {gender.gender}
-                  </Button>
+                  <GenderCard
+                    key={gender.id}
+                    gender={gender.gender}
+                    icon={gender.icon}
+                    selected={gender.id === selectedGender}
+                    onSelect={() => {
+                      handleSelectGender(gender.id as GendersTypes);
+                    }}
+                  />
                 ))}
               </CardContent>
             </Card>
@@ -176,8 +214,6 @@ function StepContent({ step }: StepContentProp) {
               ))}
             </CardContent>
           </Card>
-
-
         </Card>
       )}
       {step === 2 && (
@@ -211,37 +247,66 @@ function StepContent({ step }: StepContentProp) {
         </Card>
       )}
       {step === 4 && (
-        <div className="flex flex-wrap border border-gray-200 rounded-lg cursor-pointer items-center flex-col ">
-          <div className="flex gap-4 m-4 p-4">
-            <h2>Ingesta Calorica</h2>
-            <p>result</p>
-          </div>
-          <div className="flex gap-4 m-4 p-4">
-            <div>
-              <h2>Protein</h2>
-              <div className="w-10 h-10 flex items-center justify-center z-10 relative bg-slate-500 rounded-full">
-                <Beef color="white" />
-              </div>
-              <p>result</p>
+        <Card className="flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center gap-4">
+          <CardTitle>Caloric Intakes</CardTitle>
+          <CardContent className="flex flex-col items-center">
+            <div className="border-2 border-gray-100  rounded-full p-2">
+              1950
             </div>
+            <div className="flex items-center my-4 gap-4">
+              {caloricIntakes.map((intake) => (
+                <CaloricIntakeCard
+                  key={intake.id}
+                  name={intake.name}
+                  icon={intake.icon}
+                  result={intake.result}
+                />
+              ))}
+            </div>
+            <CardDescription>
+              Remember, this estimate is based on your weight, height, age,
+              gender, and usual activity level. Use this information to help you
+              determine how many calories you should consume to maintain your
+              current weight. On days when you're more active, you’ll need more
+              calories, so don’t hesitate to eat a bit more. On days when you're
+              less active, consider reducing your calorie intake. If your goal
+              is to lose weight, aim to eat fewer calories than you burn or
+              increase your activity level. However, always prioritize
+              nutritious meals and avoid cutting calories too drastically.
+              Eating too little or losing weight too quickly can be harmful and
+              unsafe. Keep it balanced and healthy!
+            </CardDescription>
+          </CardContent>
 
-            <div className="mb-4 flex justify-center flex-col items-center">
-              <h2 className="text-primary-500">Carbohydrates</h2>
-              <div className="border-2 border-gray-100 bg-primary-100 rounded-full p-2">
-                <Wheat color="#5E0000" size={24} />
+          {/* <div className="flex flex-wrap border border-gray-200 rounded-lg cursor-pointer items-center flex-col ">
+            <div className="flex flex-col items-center gap-2"></div>
+            <div className="flex gap-4 m-4 p-4">
+              <div>
+                <h2>Protein</h2>
+                <div className="w-10 h-10 flex items-center justify-center z-10 relative bg-slate-500 rounded-full">
+                  <Beef />
+                </div>
+                <p>result</p>
               </div>
-              <p>result</p>
-            </div>
 
-            <div>
-              <h2>Fat</h2>
-              <div className="w-10 h-10 flex items-center justify-center z-10 relative bg-slate-500 rounded-full">
-                <Nut color="white" size={24} />
+              <div className="mb-4 flex justify-center flex-col items-center">
+                <h2 className="text-primary-500">Carbohydrates</h2>
+                <div className="border-2 border-gray-100 bg-primary-100 rounded-full p-2">
+                  <Wheat />
+                </div>
+                <p>result</p>
               </div>
-              <p>result</p>
+
+              <div>
+                <h2>Fat</h2>
+                <div className="w-10 h-10 flex items-center justify-center z-10 relative bg-slate-500 rounded-full">
+                  <Nut />
+                </div>
+                <p>result</p>
+              </div>
             </div>
-          </div>
-        </div>
+          </div> */}
+        </Card>
       )}
     </div>
   );

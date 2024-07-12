@@ -43,7 +43,7 @@ const Stepper = () => {
       </div>
       <StepContent step={currentStep} />
       <Button
-          className="btn mt-4 px-4 py-2 bg-sky-600 text-white rounded cursor-pointer w-36"
+          className=""
           onClick={() => {
             currentStep === steps.length
               ? setComplete(true)
@@ -52,18 +52,6 @@ const Stepper = () => {
         >
           {currentStep >= steps.length -1 ? "Finish" : "Next"}
         </Button>
-      {/* {!complete && (
-        <Button
-          className="btn mt-4 px-4 py-2 bg-sky-600 text-white rounded cursor-pointer w-36"
-          onClick={() => {
-            currentStep === steps.length
-              ? setComplete(true)
-              : setCurrentStep((prev) => prev + 1);
-          }}
-        >
-          {currentStep === steps.length ? "Finish" : "Next"}
-        </Button>
-      )} */}
     </div>
   );
 };

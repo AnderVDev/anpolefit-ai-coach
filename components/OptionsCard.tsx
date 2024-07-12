@@ -20,10 +20,6 @@ const OptionsCard = ({
       inset-0 flex-col items-center justify-center
       whitespace-normal bg-grey-500 text-center 
       opacity-0 transition duration-500 hover:opacity-90`;
-  //   const overlayStyles = `p-5 absolute z-30 flex
-  //       h-[380px] w-[450px] flex-col items-center justify-center
-  //       whitespace-normal bg-grey-500 text-center
-  //       opacity-0 transition duration-500 hover:opacity-90`;
 
   return (
     // <div className="relative mx-5 inline-block h-[380px] w-[450px]">
@@ -35,8 +31,8 @@ const OptionsCard = ({
     >
       <div className={overlayStyles}>
         <h2
-          className={`font-bold text-xl ${
-            selected ? "text-yellow-500" : "text-black"
+          className={`font-bold text-xl mb-2 ${
+            selected ? "text-yellow-500" : ""
           }`}
         >
           {name}
