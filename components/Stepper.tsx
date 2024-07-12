@@ -41,7 +41,7 @@ const Stepper = () => {
           </div>
         ))}
       </div>
-      <StepContent />
+      <StepContent step={currentStep} />
       <Button
           className="btn mt-4 px-4 py-2 bg-sky-600 text-white rounded cursor-pointer w-36"
           onClick={() => {

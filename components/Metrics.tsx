@@ -4,7 +4,7 @@ import { Input } from "./ui/input";
 
 function Metrics() {
   return (
-    <Tabs defaultValue="account" className="flex flex-col items-center w-full">
+    <Tabs defaultValue="metric" className="flex flex-col items-center w-full">
       <TabsList>
         <TabsTrigger value="imperial">Imperial</TabsTrigger>
         <TabsTrigger value="metric">Metric</TabsTrigger>
