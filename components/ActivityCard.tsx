@@ -20,13 +20,13 @@ function ActivityCard({
 }: ActivityCardProps) {
   return (
     <div
-      className={`flex p-4 gap-4 items-center border border-gray-100 rounded-lg shadow-current cursor-pointer ${
+      className={`flex flex-col p-4 items-center border border-gray-100 rounded-lg shadow-current cursor-pointer ${
         selected ? selectedStyle : unselectedStyle
       }`}
       onClick={onSelect}
     >
+      {/* <div> */}
         <h3>{image}</h3>
-      <div>
         <h2
           className={`font-bold text-sm mb-1 ${
             selected ? "text-primary-500" : ""
@@ -35,7 +35,7 @@ function ActivityCard({
           {title}
         </h2>
         <p className="text-xs">{description}</p>
-      </div>
+      {/* </div> */}
     </div>
   );
 }

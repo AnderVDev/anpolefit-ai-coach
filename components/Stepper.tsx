@@ -43,7 +43,7 @@ const Stepper = () => {
       </div>
       <StepContent step={currentStep} />
       <Button
-          className=""
+          className="bg-gray-500 rounded-lg"
           onClick={() => {
             currentStep === steps.length
               ? setComplete(true)

@@ -1,6 +1,7 @@
 "use client";
 
 import { assistantAtom, userThreadAtom } from "@/atoms";
+import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useAtom } from "jotai";
 import { Run, ThreadMessage } from "openai/resources/beta/threads/index.mjs";
@@ -212,11 +213,11 @@ function ChatPage() {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`px-4 py-2 mb-3 rounded-lg w-fit text-sm ${
+            className={`px-4 py-2 mb-3 rounded-lg w-fit text-sm  ${
               ["true", "True"].includes(
                 (message.metadata as { fromUser?: string }).fromUser ?? ""
               )
-                ? "bg-secondary-500 ml-auto"
+                ? "bg-purpleSecondary-600 ml-auto"
                 : "bg-gray-100"
             }`}
           >
@@ -227,7 +228,21 @@ function ChatPage() {
                     (
                       text: string | null,
                       index: React.Key | null | undefined
-                    ) => <p key={index}>{text}</p>
+                    ) => (
+                      <p
+                        key={index}
+                        className={` ${
+                          ["true", "True"].includes(
+                            (message.metadata as { fromUser?: string })
+                              .fromUser ?? ""
+                          )
+                            ? "text-gray-20"
+                            : ""
+                        }`}
+                      >
+                        {text}
+                      </p>
+                    )
                   )
               : null}
           </div>
@@ -244,15 +259,15 @@ function ChatPage() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <button
+          <Button
             disabled={
               !userThread?.threadId || !assistant || sending || !message.trim()
             }
-            className="ml-4 bg-primary-500 text-gray-20 px-4 py-2 rounded-full focus:outline-none disabled:bg-secondary-500 disabled:text-gray-500"
+            className="bg-primary-500 text-gray-20 rounded-full focus:outline-none disabled:bg-gray-500 m-0"
             onClick={sendMessage}
           >
             {sending ? "Sending..." : pollingRun ? "Polling Run..." : "Send"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -7,20 +7,26 @@ import OptionsCard from "./OptionsCard";
 import { Beef, Wheat, Nut, UserRound } from "lucide-react";
 import GenderCard from "./GenderCard";
 import CaloricIntakeCard from "./CaloricIntakeCard";
+import buildImage from "@/app/assets/build_anpolefit.png"
+import recompositionImage from "@/app/assets/recomposition_anpole.png"
+import ectomorphBody from "@/app/assets/Ectomorph_body.jpg"
+import mesomorphBody from "@/app/assets/Mesomorph_body.jpg"
+import endomorphBody from "@/app/assets/Endomorph_body.png"
+
 
 const cardStyle =
-  "flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center";
+  "flex items-center flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center w-80 h-48";
 
 const genders = [
   {
     id: "MALE",
     gender: "Male",
-    icon: <UserRound />,
+    icon: <UserRound size={16} />,
   },
   {
     id: "FEMALE",
     gender: "Female",
-    icon: <UserRound />,
+    icon: <UserRound size={16} />,
   },
 ];
 type GendersTypes = "MALE" | "FEMALE";
@@ -31,28 +37,28 @@ const activities = [
     title: "Sedentary",
     description:
       "Involves minimal physical activity throughout the day, primarily sitting or lying down. Examples: Desk jobs, watching TV, reading.",
-    image: "txt",
+    image: "image",
   },
   {
     id: "LIGHT",
     title: "Light Activity",
     description:
       "Includes light physical activities that don't significantly increase heart rate. Examples: Walking short distances, light household chores like cooking or washing dishes. ",
-    image: "txt",
+    image: "image",
   },
   {
     id: "MODERATE",
     title: "Moderate Activity",
     description:
       "Involves activities that increase heart rate and may cause a light sweat. Examples: Brisk walking, recreational swimming, gardening.",
-    image: "txt",
+    image: "image",
   },
   {
     id: "VERY",
     title: "Very Active",
     description:
       "Includes intense physical activities that significantly increase heart rate and cause sweating. Examples: Running, cycling at a fast pace, playing competitive sports.",
-    image: "txt",
+    image: "image",
   },
 ];
 type Activities = "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY";
@@ -63,14 +69,14 @@ const expectations = [
     name: "Build Muscle",
     description:
       "Focuses on increasing muscle mass through resistance training and adequate nutrition. Examples: Lifting weights, strength training exercises targeting specific muscle groups.",
-    image: "TXT",
+    image: buildImage,
   },
   {
     id: "RECOMPOSITION",
     name: "Body Recomposition",
     description:
       "Aims to simultaneously reduce body fat and increase muscle mass to change body composition. Examples: Combining strength training with cardiovascular exercises and a balanced diet to achieve a leaner physique.",
-    image: "TXT",
+    image: recompositionImage,
   },
 ];
 type Expectations = "BUILD" | "RECOMPOSITION";
@@ -81,21 +87,21 @@ const bodiesTypes = [
     name: "Ectomorph",
     description:
       "Characterized by a slim, lean build with a fast metabolism. Ectomorphs often find it difficult to gain weight and muscle. Examples: Narrow shoulders and hips, low body fat, and long limbs",
-    image: "TXT",
+    image: ectomorphBody,
   },
   {
     id: "MESOMORPH",
     name: "Mesomorph",
     description:
       "Typically has a muscular, well-defined build with a natural ability to gain muscle and strength easily. Examples: Broad shoulders, narrow waist, and a generally athletic appearance.",
-    image: "TXT",
+    image: mesomorphBody,
   },
   {
     id: "ENDOMORPH",
     name: "Endomorph",
     description:
       "Tends to have a higher body fat percentage with a rounder physique. Endomorphs may find it easier to gain weight but struggle to lose fat. Examples: Wider waist, larger bone structure, and more fat accumulation in the lower body.",
-    image: "TXT",
+    image: endomorphBody,
   },
 ];
 
@@ -152,54 +158,58 @@ function StepContent({ step }: StepContentProp) {
     setSelectedBodyType(bodyTypeId);
   };
   return (
-    <div>
+    <div className="flex items-center ">
       {step === 1 && (
-        <Card className="flex flex-grow flex-col p-4 border border-gray-200 rounded-lg ">
-          <div className="grid grid-col-1 md:grid-cols-2 gap-4 m-4">
-            {/* Gender */}
-            <Card className={`${cardStyle}`}>
-              <CardTitle>Gender</CardTitle>
-              <CardContent className="flex gap-4 m-4">
-                {genders.map((gender) => (
-                  <GenderCard
-                    key={gender.id}
-                    gender={gender.gender}
-                    icon={gender.icon}
-                    selected={gender.id === selectedGender}
-                    onSelect={() => {
-                      handleSelectGender(gender.id as GendersTypes);
-                    }}
-                  />
-                ))}
-              </CardContent>
-            </Card>
+        <Card className="flex items-center  flex-col flex-grow border border-gray-200 rounded-lg gap-2">
+          <div className="m-4 grid grid-col-1 justify-items-center gap-4 md:grid-cols-2">
+            <div className="flex justify-between flex-col items-center w-80 h-60">
+              {/* Gender */}
+              <Card className={`${cardStyle} p-0 h-24 w-64`}>
+                <CardTitle className="my-2 text-base">Gender</CardTitle>
+                <CardContent className="flex items-center p-0 gap-2 ">
+                  {genders.map((gender) => (
+                    <GenderCard
+                      key={gender.id}
+                      gender={gender.gender}
+                      icon={gender.icon}
+                      selected={gender.id === selectedGender}
+                      onSelect={() => {
+                        handleSelectGender(gender.id as GendersTypes);
+                      }}
+                    />
+                  ))}
+                </CardContent>
+              </Card>
 
-            {/* Age */}
-            <Card className={`${cardStyle}`}>
-              <CardTitle>Age</CardTitle>
-              <CardContent>
-                <Counter
-                  minLevel={10}
-                  maxLevel={150}
-                  steps={1}
-                  initialValue={18}
-                  label={"years old"}
-                />
+              {/* Age */}
+              <Card className={`${cardStyle} p-0 h-32 w-64`}>
+                <CardTitle className="my-2 text-base">Age</CardTitle>
+                <CardContent className="p-0">
+                  <Counter
+                    minLevel={10}
+                    maxLevel={150}
+                    steps={1}
+                    initialValue={18}
+                    label={"years old"}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* metrics */}
+            <Card className="flex items-center flex-col flex-grow border border-gray-200 rounded-lg cursor-pointer w-64 h-60 ">
+              <CardContent className="p-2">
+                <Metrics />
               </CardContent>
             </Card>
           </div>
 
-          {/* metrics */}
-          <Card className="flex flex-col p-4 border border-gray-200 rounded-lg cursor-pointer items-center m-4">
-            <CardContent>
-              <Metrics />
-            </CardContent>
-          </Card>
-
           {/* activity */}
-          <Card className="flex flex-col p-4 border border-gray-200 rounded-lg cursor-pointer items-center m-4">
-            <CardTitle className="mb-2">How Active Are You?</CardTitle>
-            <CardContent className="grid grid-col-1 md:grid-cols-2 gap-4">
+          <Card className="flex flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center  h-auto w-64 md:w-[590px] mb-4 ">
+            <CardTitle className="mb-2 text-base">
+              How Active Are You?
+            </CardTitle>
+            <CardContent className="grid grid-col-1 md:grid-cols-2 gap-2">
               {activities.map((activity) => (
                 <ActivityCard
                   key={activity.id}
@@ -216,8 +226,10 @@ function StepContent({ step }: StepContentProp) {
           </Card>
         </Card>
       )}
+
       {step === 2 && (
-        <Card className="flex flex-wrap cursor-pointer">
+        <Card className="cursor-pointer gap-0 border border-gray-200 rounded-lg">
+          <div className=" grid grid-col-1 justify-items-center md:grid-cols-2 overflow-hidden">
           {expectations.map((expectation) => (
             <OptionsCard
               key={expectation.id}
@@ -230,8 +242,12 @@ function StepContent({ step }: StepContentProp) {
               }
             />
           ))}
+
+          </div>
+          
         </Card>
       )}
+
       {step === 3 && (
         <Card className="flex flex-wrap border border-gray-200 rounded-lg cursor-pointer items-center flex-col md:flex-row">
           {bodiesTypes.map((type) => (
@@ -246,6 +262,7 @@ function StepContent({ step }: StepContentProp) {
           ))}
         </Card>
       )}
+
       {step === 4 && (
         <Card className="flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center gap-4">
           <CardTitle>Caloric Intakes</CardTitle>
