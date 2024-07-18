@@ -26,7 +26,7 @@ function ActivityCard({
       onClick={onSelect}
     >
       {/* <div> */}
-        <h3>{image}</h3>
+        {/* <h3>{image}</h3> */}
         <h2
           className={`font-bold text-sm mb-1 ${
             selected ? "text-primary-500" : ""

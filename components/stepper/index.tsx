@@ -1,8 +1,9 @@
 "use client"
 import React, { useState } from "react";
 import { Check } from 'lucide-react';
-import { Button } from "./ui/button";
 import StepContent from "./StepContent";
+import { Button } from "../ui/button";
+
 
 const Stepper = () => {
   const steps = ["About You", "Expectations", "Body Type", "Results"];

@@ -9,6 +9,7 @@ interface CounterProp {
   steps: number;
   initialValue: number;
   label: string;
+  onChange: (value: number) => void;
 }
 
 export function Counter({
@@ -17,11 +18,14 @@ export function Counter({
   steps,
   initialValue,
   label,
+  onChange,
 }: CounterProp) {
   const [goal, setGoal] = React.useState(initialValue);
 
   function onClick(adjustment: number) {
-    setGoal(Math.max(minLevel, Math.min(maxLevel, goal + adjustment)));
+    const newGoal = Math.max(minLevel, Math.min(maxLevel, goal + adjustment));
+    setGoal(newGoal);
+    onChange(newGoal);
   }
 
   return (
