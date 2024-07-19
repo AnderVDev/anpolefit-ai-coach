@@ -42,8 +42,8 @@ function RadialProgress({ value, total }: RadialProgressProp) {
             fill="none"
             className="stroke-current text-gray-500 rounded-lg"
             strokeWidth="4"
-            strokeDasharray={circumference.toString()}
-            strokeDashoffset={offset}
+            strokeDasharray={circumference}
+            strokeDashoffset={offset || 0}
           ></circle>
         </g>
       </svg>

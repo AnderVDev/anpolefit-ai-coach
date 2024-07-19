@@ -32,7 +32,9 @@ function Navbar() {
             key={idx}
             href={route.path}
             className={
-              pathname === route.path ? "border-b-2 border-gray-500 font-extrabold" : ""
+              pathname === route.path
+                ? "border-b-2 border-gray-500 font-extrabold"
+                : ""
             }
           >
             {route.name}

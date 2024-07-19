@@ -8,6 +8,8 @@
         "Metas",
         "nextjs",
         "openai",
-        "prismadb"
+        "prismadb",
+        "tdci",
+        "tdee"
     ]
 }

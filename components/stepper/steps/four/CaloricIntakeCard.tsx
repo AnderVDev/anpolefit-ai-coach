@@ -2,12 +2,11 @@ import React from "react";
 import RadialProgress from "../../../RadialProgress";
 interface CaloricIntakeCardProps {
   name: string;
-  icon: JSX.Element;
   result: number;
   total: number;
 }
 
-function CaloricIntakeCard({ name, icon, result, total }: CaloricIntakeCardProps) {
+function CaloricIntakeCard({ name,  result, total }: CaloricIntakeCardProps) {
   return (
     <div className="flex justify-center flex-col items-center p-4">
       <RadialProgress value={result} total={total} />

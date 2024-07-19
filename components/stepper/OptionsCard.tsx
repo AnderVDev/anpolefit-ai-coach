@@ -36,7 +36,7 @@ const OptionsCard = ({
         src={image}
         alt={`${image}`}
         className="h-full w-full object-cover"
-        layout="fill"
+        
       />
     </div>
   );
