@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       assistant_id: assistantId,
     });
 
-    console.log("from openai run", run);
+    // console.log("from openai run", run);
 
     return NextResponse.json({ run, success: true }, { status: 201 });
     

@@ -4,7 +4,7 @@ import OpenAI from "openai";
 export async function POST(req: Request) {
   const { message, threadId, fromUser = false } = await req.json();
 
-  console.log("from user", { message, threadId });
+  // console.log("from user", { message, threadId });
 
   if (!threadId || !message) {
     return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("from openai", threadMessage);
+    // console.log("from openai", threadMessage);
 
     return NextResponse.json(
       { message: threadMessage, success: true },

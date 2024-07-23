@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     );
   }
 
-  console.log(message);
+  // console.log(message);
 
   // Grab all challenge preferences
   const challengePreferences = await prismadb.challengePreferences.findMany({

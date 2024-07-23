@@ -33,7 +33,7 @@ function StepContent({ step }: StepContentProps) {
   };
 
   const handleDataChange = (data: {
-    age: number | null;
+    age: number ;
     weight: number | null;
     height: number | null;
     bmr: number | null;
@@ -43,6 +43,8 @@ function StepContent({ step }: StepContentProps) {
   }) => {
     setStepOneData(data);
   };
+
+  console.log({stepOneData})
   const handleExpectationChange = (
     expectation: "BUILD" | "RECOMPOSITION" | null
   ) => {
@@ -53,9 +55,6 @@ function StepContent({ step }: StepContentProps) {
   ) => {
     setBodyType(bodyType);
   };
-
-  // console.log({ tdee, expectation, bodyType });
-  // console.log({ stepOneData });
 
   return (
     <div className="flex items-center ">

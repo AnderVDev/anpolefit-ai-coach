@@ -14,6 +14,10 @@ const routes = [
     path: "/calculator",
   },
   {
+    name: "Recipes",
+    path: "/recipes",
+  },
+  {
     name: "Profile",
     path: "/profile",
   },

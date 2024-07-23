@@ -9,27 +9,6 @@ interface CaloricIntake {
   total: number;
 }
 
-// const caloricIntakes = [
-//   {
-//     id: "PROTEIN",
-//     name: "Protein",
-//     result: 750,
-//     total: 1950,
-//   },
-//   {
-//     id: "CARBOHYDRATES",
-//     name: "Carbohydrates",
-//     result: 650,
-//     total: 1950,
-//   },
-//   {
-//     id: "FAT",
-//     name: "Fat",
-//     result: 550,
-//     total: 1950,
-//   },
-// ];
-
 const initialCaloricIntakes: CaloricIntake[] = [
   { id: "PROTEIN", name: "Protein", result: 0, total: 0 },
   {
@@ -131,9 +110,9 @@ function StepFour({ inputs }: StepFourProps) {
       },
       { id: "FAT", name: "Fat", result: fatKcal, total: tdci },
     ]);
-  }, [tdci, proteinKcal, carbKcal. fatKcal]);
+  }, [tdci, proteinKcal, carbKcal, fatKcal]);
 
-  console.log({ tdci, results });
+
 
   return (
     <Card className="flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center gap-4 w-96 h-72">

@@ -44,7 +44,11 @@ function StepThree({ onBodyTypeChange }: StepThreeProps) {
   };
 
   useEffect(() => {
-    onBodyTypeChange(selectedBodyType);
+    const bodyType= onBodyTypeChange(selectedBodyType);
+
+
+    // Clean up on unmount
+    // return () => clearInterval(bodyType);
   }, [selectedBodyType]);
 
   return (

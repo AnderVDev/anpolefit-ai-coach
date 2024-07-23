@@ -1,10 +1,15 @@
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import React, { useEffect, useState } from "react";
-import { Counter } from "./Counter";
 import Metrics from "./Metrics";
 import ActivityCard from "@/components/ActivityCard";
 import { UserRound } from "lucide-react";
 import GenderCard from "./GenderCard";
+import { Input } from "@/components/ui/input";
 
 const cardStyle =
   "flex items-center flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center w-80 h-48";
@@ -53,7 +58,7 @@ const TDDE_CONSTANTS = {
 
 interface StepOneProps {
   onDataChange: (data: {
-    age: number | null;
+    age: number;
     weight: number | null;
     height: number | null;
     bmr: number | null;
@@ -74,15 +79,15 @@ function StepOne({ onDataChange }: StepOneProps) {
     null
   );
 
-  const [data, setData] = useState({
-    age: 18,
-    weight: 0,
-    height: 0,
-    bmr: null as number | null,
-    tdee: null as number | null,
-    selectedGender: null as GendersTypes | null,
-    selectedActivity: null as Activities | null,
-  });
+  // const [data, setData] = useState({
+  //   age: 18,
+  //   weight: 0,
+  //   height: 0,
+  //   bmr: null as number | null,
+  //   tdee: null as number | null,
+  //   selectedGender: null as GendersTypes | null,
+  //   selectedActivity: null as Activities | null,
+  // });
 
   const handleSelectGender = (genderId: GendersTypes) => {
     setSelectedGender(genderId);
@@ -90,6 +95,10 @@ function StepOne({ onDataChange }: StepOneProps) {
 
   const handleSelectActivity = (activityId: Activities) => {
     setSelectedActivity(activityId);
+  };
+
+  const handleAgeGender = (age: number) => {
+    setAge(age);
   };
 
   const calculateBMR = () => {
@@ -119,10 +128,10 @@ function StepOne({ onDataChange }: StepOneProps) {
   }, [age, weight, height, selectedGender, selectedActivity]);
 
   return (
-    <Card className="flex items-center flex-col flex-grow border border-gray-200 rounded-lg gap-2">
-      <div className="m-4 grid grid-col-1 justify-items-center gap-4 md:grid-cols-2">
-        <div className="flex justify-between flex-col items-center w-80 h-60">
-          <Card className={`${cardStyle} p-0 h-24 w-64`}>
+    <Card className="flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg gap-2 p-4">
+      <div className="md:w-[590px] grid grid-col-1 md:grid-cols-3 justify-between">
+        <div className="md:col-start-1 md:col-span-1 flex justify-between place-content-between flex-col items-center w-64 h-48">
+          <Card className={`${cardStyle} p-0 h-28 w-60`}>
             <CardTitle className="my-2 text-base">Gender</CardTitle>
             <CardContent className="flex items-center p-0 gap-2">
               {genders.map((gender) => (
@@ -136,27 +145,28 @@ function StepOne({ onDataChange }: StepOneProps) {
               ))}
             </CardContent>
           </Card>
-          <Card className={`${cardStyle} p-0 h-32 w-64`}>
+          <Card className="flex items-center flex-col md:flex-row border justify-center md:gap-4 border-gray-200 rounded-lg cursor-pointer mt-2 p-0 h-28 md:h-24 w-60">
             <CardTitle className="my-2 text-base">Age</CardTitle>
-            <CardContent className="p-0">
-              <Counter
-                minLevel={10}
-                maxLevel={150}
-                steps={1}
-                initialValue={age}
-                label={"years old"}
-                onChange={setAge}
+            <CardContent className=" flex flex-col gap-1 items-center p-0">
+              <Input
+                className="w-14 h-8 mb-2 md:mb-0 p-2"
+                type="text"
+                placeholder="age"
+                onChange={(e) => handleAgeGender(parseFloat(e.target.value))}
               />
             </CardContent>
           </Card>
         </div>
-        <Card className="flex items-center flex-col flex-grow border border-gray-200 rounded-lg cursor-pointer w-64 h-60">
-          <CardContent className="p-2">
+
+        <Card className="mt-2 md:mt-0 md:mr-4 md:col-end-4 md:col-span-2 flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg cursor-pointer w-60 md:w-80 md:h-48 mx-auto">
+          <CardContent className="p-2 md:p-0 items-center justify-center">
             <Metrics onWeightChange={setWeight} onHeightChange={setHeight} />
           </CardContent>
         </Card>
       </div>
-      <Card className="flex flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center h-auto w-64 md:w-[590px] mb-4">
+
+      {/* Activities */}
+      <Card className="flex flex-col border justify-center  border-gray-200 rounded-lg cursor-pointer items-center h-auto w-60 md:w-[590px] mb-4">
         <CardTitle className="mb-2 text-base">How Active Are You?</CardTitle>
         <CardContent className="grid grid-col-1 md:grid-cols-2 gap-2">
           {activities.map((activity) => (
