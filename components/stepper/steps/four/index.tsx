@@ -5,19 +5,21 @@ import CaloricIntakeCard from "./CaloricIntakeCard";
 interface CaloricIntake {
   id: string;
   name: string;
-  result: number;
+  resultKcal: number;
+  resultGrams: number;
   total: number;
 }
 
 const initialCaloricIntakes: CaloricIntake[] = [
-  { id: "PROTEIN", name: "Protein", result: 0, total: 0 },
+  { id: "PROTEIN", name: "Protein", resultKcal: 0, resultGrams: 0, total: 0 },
   {
     id: "CARBOHYDRATES",
     name: "Carbohydrates",
-    result: 0,
+    resultKcal: 0,
+    resultGrams: 0,
     total: 0,
   },
-  { id: "FAT", name: "Fat", result: 0, total: 0 },
+  { id: "FAT", name: "Fat", resultKcal: 0, resultGrams: 0, total: 0 },
 ];
 
 const BODYTYPES_CONSTANTS_PERCENTAGES = {
@@ -43,7 +45,7 @@ const BODYTYPES_CONSTANTS_PERCENTAGES = {
 const KCAL_TO_GRAMS_CONSTANTS = {
   PROTEIN: 4,
   CARBOHYDRATE: 4,
-  FAT: 4,
+  FAT: 9,
 };
 
 // Target daily calorie intake (TDCI) = TDEE – (Bodyweight x target weekly fat loss rate x 500*)  *1100 if you use kg
@@ -72,8 +74,11 @@ function StepFour({ inputs }: StepFourProps) {
   );
   const [tdci, setTDCI] = useState<number>(0);
   const [proteinKcal, setProteinKcal] = useState<number>(0);
+  const [proteinGrams, setProteinGrams] = useState<number>(0);
   const [carbKcal, setCarbKcal] = useState<number>(0);
+  const [carbGrams, setCarbGrams] = useState<number>(0);
   const [fatKcal, setFatKcal] = useState<number>(0);
+  const [fatGrams, setFatGrams] = useState<number>(0);
   const { bodyType, tdee, weight } = inputs;
 
   const handleTDCIChange = () => {
@@ -84,12 +89,16 @@ function StepFour({ inputs }: StepFourProps) {
         tdee - weight * WEEKLY_FAT_LOSS_RATE * TDCI_CONSTANT["KILOGRAMS"];
       setTDCI(Math.round(TDCIFormula));
       const percentages = BODYTYPES_CONSTANTS_PERCENTAGES[bodyType];
-      setProteinKcal(Math.round((tdci * percentages.PROTEIN) / 100));
-      setCarbKcal(Math.round((tdci * percentages.CARBOHYDRATE) / 100));
-      setFatKcal(Math.round((tdci * percentages.FAT) / 100));
-      console.log({ percentages });
-    }
 
+      setProteinKcal(Math.round((tdci * percentages.PROTEIN) / 100));
+      setProteinGrams(proteinKcal / KCAL_TO_GRAMS_CONSTANTS.PROTEIN);
+
+      setCarbKcal(Math.round((tdci * percentages.CARBOHYDRATE) / 100));
+      setCarbGrams(carbKcal / KCAL_TO_GRAMS_CONSTANTS.CARBOHYDRATE);
+
+      setFatKcal(Math.round((tdci * percentages.FAT) / 100));
+      setFatGrams(fatGrams / KCAL_TO_GRAMS_CONSTANTS.FAT);
+    }
   };
 
   useEffect(() => {
@@ -99,20 +108,26 @@ function StepFour({ inputs }: StepFourProps) {
       {
         id: "PROTEIN",
         name: "Protein",
-        result: proteinKcal,
+        resultKcal: proteinKcal,
+        resultGrams: proteinGrams,
         total: tdci,
       },
       {
         id: "CARBOHYDRATES",
         name: "Carbohydrates",
-        result: carbKcal,
+        resultKcal: carbKcal,
+        resultGrams: carbGrams,
         total: tdci,
       },
-      { id: "FAT", name: "Fat", result: fatKcal, total: tdci },
+      {
+        id: "FAT",
+        name: "Fat",
+        resultKcal: fatKcal,
+        resultGrams: fatGrams,
+        total: tdci,
+      },
     ]);
-  }, [tdci, proteinKcal, carbKcal, fatKcal]);
-
-
+  }, [tdci, proteinKcal, carbKcal, fatKcal, proteinGrams, carbGrams, fatGrams]);
 
   return (
     <Card className="flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center gap-4 w-96 h-72">
@@ -121,7 +136,8 @@ function StepFour({ inputs }: StepFourProps) {
         <CaloricIntakeCard
           key={"TOTAL"}
           name={"total"}
-          result={tdci}
+          resultKcal={tdci}
+          resultGrams={1}
           total={tdci}
         />
         <div className="flex items-center ">
@@ -129,7 +145,8 @@ function StepFour({ inputs }: StepFourProps) {
             <CaloricIntakeCard
               key={intake.id}
               name={intake.name}
-              result={intake.result}
+              resultKcal={intake.resultKcal}
+              resultGrams={intake.resultGrams}
               total={intake.total}
             />
           ))}

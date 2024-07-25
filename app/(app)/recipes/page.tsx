@@ -4,6 +4,7 @@ import RecipeCard from "@/components/RecipeCard";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useAtom } from "jotai";
+import { LoaderCircleIcon } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 
 const POLLING_FREQUENCY_MS = 1000;
@@ -92,8 +93,12 @@ function Recipes() {
       </div>
 
       {fetching ? (
-        <div className="w-full items-center justify-center py-10">
-          <p className="text-center">Loading Recipes...</p>
+        <div className="flex items-center justify-center py-10">
+          <p className=" flex gap-2 text-center">
+            <LoaderCircleIcon className="animate-spin" />
+            {" "}
+            Loading Recipes...
+          </p>
         </div>
       ) : recipes?.length > 0 ? (
         <div className="w-full flex flex-wrap gap-10 px-0 lg:px-10 py-10">
@@ -102,8 +107,8 @@ function Recipes() {
           ))}
         </div>
       ) : (
-        <div className="w-full items-center justify-center py-10">
-          <p className="text-center">No Recipes Found</p>
+        <div className="flex items-center justify-center py-10">
+          <p className="flex gap-2  text-center">No Recipes Found</p>
         </div>
       )}
     </div>

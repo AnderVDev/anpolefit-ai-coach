@@ -1,12 +1,14 @@
 import React from "react";
 
 interface RadialProgressProp {
-  value: number;
+  name: string;
+  valueKcal: number;
+  valueGrams: number;
   total: number;
 }
 
-function RadialProgress({ value, total }: RadialProgressProp) {
-  const intake = (value / total) * 100;
+function RadialProgress({name, valueKcal, valueGrams, total }: RadialProgressProp) {
+  const intake = (valueKcal / total) * 100;
   // Ensure value is between 0 and 100
   const progressValue = Math.min(Math.max(intake, 0), 100);
 
@@ -49,7 +51,9 @@ function RadialProgress({ value, total }: RadialProgressProp) {
       </svg>
       {/* Percentage Text */}
       <div className="absolute top-1/2 start-1/2 transform -translate-y-1/2 -translate-x-1/2">
-        <span className="text-center text-sm font-bold ">{value}</span>
+        <p className="text-center text-xs font-bold ">
+          {valueKcal} <br />{name !== "total" && <span>/ {valueGrams} g</span>}
+        </p>
       </div>
     </div>
   );

@@ -26,6 +26,8 @@ interface StepTwoProps {
   onExpectationChange: (expectation: Expectations | null) => void;
 }
 
+const POLLING_FREQUENCY_MS = 1000;
+
 function StepTwo({ onExpectationChange }: StepTwoProps) {
   const [selectedExpectation, setSelectedExpectation] =
     useState<Expectations | null>(null);
@@ -34,8 +36,13 @@ function StepTwo({ onExpectationChange }: StepTwoProps) {
   };
 
   useEffect(() => {
-    onExpectationChange(selectedExpectation);
+    const timer = setTimeout(() => {
+      onExpectationChange(selectedExpectation);
+    }, POLLING_FREQUENCY_MS);
+    // onExpectationChange(selectedExpectation);
+    return () => clearTimeout(timer);
   }, [selectedExpectation]);
+
   return (
     <Card className="cursor-pointer gap-0 border border-gray-200 rounded-lg">
       <div className=" grid grid-col-1 justify-items-center md:grid-cols-2 overflow-hidden">
