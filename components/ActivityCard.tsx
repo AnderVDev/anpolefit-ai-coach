@@ -1,7 +1,7 @@
 import React from "react";
 
-const selectedStyle = "ring-2 ring-primary-500 bg-primary-500 bg-opacity-10";
-const unselectedStyle = "hover:bg-gray-100";
+const selectedStyle = "ring-2 ring-gray-500 bg-gray-500 bg-opacity-10";
+const unselectedStyle = "";
 
 interface ActivityCardProps {
   title: string;
@@ -20,22 +20,13 @@ function ActivityCard({
 }: ActivityCardProps) {
   return (
     <div
-      className={`flex flex-col p-4 items-center border border-gray-100 rounded-lg shadow-current cursor-pointer ${
+      className={`flex flex-col p-4 items-center border border-gray-100 rounded-lg shadow-current cursor-pointer hover:bg-gray-100 ${
         selected ? selectedStyle : unselectedStyle
       }`}
       onClick={onSelect}
     >
-      {/* <div> */}
-        {/* <h3>{image}</h3> */}
-        <h2
-          className={`font-bold text-sm mb-1 ${
-            selected ? "text-primary-500" : ""
-          }`}
-        >
-          {title}
-        </h2>
-        <p className="text-xs">{description}</p>
-      {/* </div> */}
+      <h2 className={`font-bold text-sm mb-1 `}>{title}</h2>
+      <p className="text-xs">{description}</p>
     </div>
   );
 }

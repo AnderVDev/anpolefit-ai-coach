@@ -263,7 +263,7 @@ function ChatPage() {
             disabled={
               !userThread?.threadId || !assistant || sending || !message.trim()
             }
-            className="bg-primary-500 text-gray-20 rounded-full focus:outline-none disabled:bg-gray-500 m-0"
+            className="bg-gray-500 text-gray-20 rounded-full focus:outline-none disabled:bg-gray-500 m-0"
             onClick={sendMessage}
           >
             {sending ? "Sending..." : pollingRun ? "Polling Run..." : "Send"}
