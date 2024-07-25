@@ -125,7 +125,7 @@ function ChatPage() {
           return;
         }
 
-        console.log("run", run);
+        // console.log("run", run);
 
         if (run.status === "completed") {
           clearInterval(intervalId);

@@ -11,6 +11,10 @@ const API_URL = process.env.NEXT_PUBLIC_BASE_URL_EDAMAM;
 const APP_ID = process.env.NEXT_PUBLIC_APP_ID_EDAMAM;
 const APP_KEY = process.env.NEXT_PUBLIC_APP_KEY_EDAMAM;
 
+interface RecipesProps {
+  recipe: any;
+}
+
 function Recipes() {
   // Atom State
   const [userThread] = useAtom(userThreadAtom);
@@ -21,73 +25,85 @@ function Recipes() {
   const [query, setQuery] = useState("Pancake");
   const URL = `${API_URL}?app_id=${APP_ID}&app_key=${APP_KEY}&q=${query}&type=public`;
 
-  const handleInputChange = (e: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
-    setQuery(e.target.value);
-  };
-  //   if (loading) {
-  //     return <p>loading...</p>;
-  //   }
-
   const fetchRecipes = useCallback(async () => {
-    // if (!userThread) return;
+    if (!userThread) return;
 
     setFetching(true);
 
     try {
       const { data } = await axios.get(URL);
-      const {hits, error} = data
+      const { hits, error } = data;
 
       // Validation
       if (!data || error) {
-        console.error(data.error ?? "Unknown error.");
+        console.error(error ?? "Unknown error.");
+        setRecipes([]);
         return;
       }
 
-      setRecipes(hits);
-      console.log(hits);
+      setRecipes(hits.map((hit: any) => hit.recipe));
+      // setRecipes(hits);
+      // console.log(recipes);
     } catch (error) {
       console.error(error);
       setRecipes([]);
     } finally {
       setFetching(false);
     }
-    console.log({ recipes });
-  }, [userThread]);
+    // console.log({ recipes });
+  }, [userThread, query]);
 
   useEffect(() => {
-    fetchRecipes();
-  }, []);
+    if (query) {
+      const timer = setTimeout(() => {
+        fetchRecipes();
+      }, POLLING_FREQUENCY_MS);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(fetchRecipes, POLLING_FREQUENCY_MS);
+      return () => clearTimeout(timer);
+    }
+  }, [query, fetchRecipes]);
 
-  //   // Clean up on unmount
-  //   return () => clearInterval(intervalId);
-  // }, [fetchRecipes]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(e.target.value);
+    },
+    []
+  );
+
+  const handleSearchedRecipe = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      fetchRecipes();
+    },
+    [fetchRecipes]
+  );
 
   return (
     <div className="w-full">
       <div className="w-full flex items-center justify-center pt-10 pb-5 px-0 md:px-10">
-        <form className="w-full lg:w-2/4">
-          {" "}
+        <form className="w-full lg:w-2/4" onSubmit={handleSearchedRecipe}>
           <Input
             className="rounded-full"
-            placeholder="eg. Cake, vegan, Chicken"
+            placeholder="eg. Pancake, Cake, Vegan, Chicken"
             onChange={handleInputChange}
+            inputMode="text"
           />
         </form>
       </div>
-      {recipes?.length > 0 ? (
+
+      {fetching ? (
+        <div className="w-full items-center justify-center py-10">
+          <p className="text-center">Loading Recipes...</p>
+        </div>
+      ) : recipes?.length > 0 ? (
         <div className="w-full flex flex-wrap gap-10 px-0 lg:px-10 py-10">
-          {recipes?.map((item, index) => (
-            <RecipeCard recipe={item.recipe} key={index} />
+          {recipes?.map((recipe, index) => (
+            <RecipeCard recipe={recipe} key={index} />
           ))}
         </div>
       ) : (
         <div className="w-full items-center justify-center py-10">
-          <p className="text-center">No Recipe Found</p>
+          <p className="text-center">No Recipes Found</p>
         </div>
       )}
     </div>
