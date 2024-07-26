@@ -1,9 +1,9 @@
-"use client"
+"use client";
 import React, { useState } from "react";
-import { Check } from 'lucide-react';
+import { Check, TriangleAlert } from "lucide-react";
 import StepContent from "./StepContent";
 import { Button } from "../ui/button";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Stepper = () => {
   const steps = ["About You", "Expectations", "Body Type", "Results"];
@@ -11,7 +11,7 @@ const Stepper = () => {
   const [complete, setComplete] = useState(false);
 
   return (
-    <div  className="flex flex-col items-center">
+    <div className="flex flex-col items-center">
       <div className="flex justify-between mb-4 ">
         {steps.map((step, i) => (
           <div
@@ -23,7 +23,9 @@ const Stepper = () => {
             {i !== 0 && (
               <div
                 className={`absolute w-full h-[3px] right-2/4 top-1/3 -translate-y-2/4 ${
-                  i + 1 < currentStep || complete ? "bg-primary-500" : "bg-gray-100"
+                  i + 1 < currentStep || complete
+                    ? "bg-primary-500"
+                    : "bg-gray-100"
                 }`}
               />
             )}
@@ -38,21 +40,29 @@ const Stepper = () => {
             >
               {i + 1 < currentStep || complete ? <Check size={24} /> : i + 1}
             </div>
-            <p >{step}</p>
+            <p>{step}</p>
           </div>
         ))}
       </div>
       <StepContent step={currentStep} />
       <Button
-          className="bg-gray-500 rounded-lg"
-          onClick={() => {
-            currentStep === steps.length
-              ? setComplete(true)
-              : setCurrentStep((prev) => prev + 1);
-          }}
-        >
-          {currentStep >= steps.length -1 ? "Finish" : "Next"}
-        </Button>
+        className="bg-gray-500 rounded-lg"
+        onClick={() => {
+          currentStep === steps.length
+            ? setComplete(true)
+            : setCurrentStep((prev) => prev + 1);
+        }}
+      >
+        {currentStep >= steps.length - 1 ? "Finish" : "Next"}
+      </Button>
+
+      <Alert variant="destructive">
+        <TriangleAlert className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          Your session has expired. Please log in again.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 };

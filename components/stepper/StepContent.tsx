@@ -7,6 +7,16 @@ import { useState } from "react";
 interface StepContentProps {
   step: number;
 }
+interface StepOneData {
+  age: number | null;
+  weight: number | null;
+  height: number | null;
+  bmr: number | null;
+  tdee: number | null;
+  selectedGender: "MALE" | "FEMALE" | null;
+  selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
+  isError: boolean;
+}
 
 function StepContent({ step }: StepContentProps) {
   const [expectation, setExpectation] = useState<
@@ -16,14 +26,15 @@ function StepContent({ step }: StepContentProps) {
     "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null
   >(null);
 
-  const [stepOneData, setStepOneData] = useState({
-    age: 18,
+  const [stepOneData, setStepOneData] = useState<StepOneData>({
+    age: null,
     weight: null,
     height: null,
     bmr: null,
     tdee: null,
     selectedGender: null,
     selectedActivity: null,
+    isError: true,
   });
 
   const inputs = {
@@ -33,18 +44,19 @@ function StepContent({ step }: StepContentProps) {
   };
 
   const handleDataChange = (data: {
-    age: number ;
+    age: number | null;
     weight: number | null;
     height: number | null;
     bmr: number | null;
     tdee: number | null;
     selectedGender: "MALE" | "FEMALE" | null;
     selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
+    isError: boolean;
   }) => {
     setStepOneData(data);
   };
 
-  console.log({stepOneData})
+  console.log({ stepOneData });
   const handleExpectationChange = (
     expectation: "BUILD" | "RECOMPOSITION" | null
   ) => {

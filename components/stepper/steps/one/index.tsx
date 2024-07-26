@@ -1,10 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
-import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import React, { useCallback, useEffect, useState } from "react";
 import Metrics from "./Metrics";
 import ActivityCard from "@/components/ActivityCard";
 import { UserRound } from "lucide-react";
@@ -58,20 +53,22 @@ const TDDE_CONSTANTS = {
 
 interface StepOneProps {
   onDataChange: (data: {
-    age: number;
+    age: number | null;
     weight: number | null;
     height: number | null;
     bmr: number | null;
     tdee: number | null;
     selectedGender: GendersTypes | null;
     selectedActivity: Activities | null;
+    isError: boolean;
   }) => void;
 }
+const POLLING_FREQUENCY_MS = 1000;
 
 function StepOne({ onDataChange }: StepOneProps) {
-  const [age, setAge] = useState<number>(18);
-  const [weight, setWeight] = useState<number>(0);
-  const [height, setHeight] = useState<number>(0);
+  const [age, setAge] = useState<number | null>(null);
+  const [weight, setWeight] = useState<number | null>(null);
+  const [height, setHeight] = useState<number | null>(null);
   const [selectedGender, setSelectedGender] = useState<GendersTypes | null>(
     null
   );
@@ -79,53 +76,105 @@ function StepOne({ onDataChange }: StepOneProps) {
     null
   );
 
-  // const [data, setData] = useState({
-  //   age: 18,
-  //   weight: 0,
-  //   height: 0,
-  //   bmr: null as number | null,
-  //   tdee: null as number | null,
-  //   selectedGender: null as GendersTypes | null,
-  //   selectedActivity: null as Activities | null,
-  // });
+  const [isError, setIsError] = useState<boolean>(true);
+  const [bmr, setBMR] = useState<number | null>(null);
+  const [tdee, setTDEE] = useState<number | null>(null);
 
-  const handleSelectGender = (genderId: GendersTypes) => {
+  const [data, setData] = useState({
+    age: age,
+    weight: weight,
+    height: height,
+    bmr: bmr,
+    tdee: tdee,
+    selectedGender: selectedGender,
+    selectedActivity: selectedActivity,
+  });
+
+  const handleSelectGender = useCallback(async (genderId: GendersTypes) => {
     setSelectedGender(genderId);
-  };
+  }, []);
 
-  const handleSelectActivity = (activityId: Activities) => {
+  const handleSelectActivity = useCallback(async (activityId: Activities) => {
     setSelectedActivity(activityId);
-  };
+  }, []);
 
   const handleAgeGender = (age: number) => {
     setAge(age);
   };
 
-  const calculateBMR = () => {
-    if (!selectedGender || !weight || !height) return 0;
-    return selectedGender === "FEMALE"
-      ? 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age
-      : 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
-  };
+  const onErrorChange = useCallback(async () => {
+    if (age && weight && height && selectedActivity && selectedGender) {
+      setIsError((prev) => (prev = false));
+    }
+  }, [age, height, selectedActivity, selectedGender, weight]);
 
-  const calculateTDEE = (bmr: number) => {
-    if (!selectedActivity || !selectedGender || !weight || !height) return 0;
-    return bmr * TDDE_CONSTANTS[selectedActivity];
-  };
+  // const calculateBMR = useCallback(async () => {
+  //   if (!selectedGender || !weight || !height) return 0;
 
-  useEffect(() => {
-    const BMRValue = calculateBMR();
-    const TDEEValue = calculateTDEE(BMRValue);
+  //   if (age) {
+  //     return selectedGender === "FEMALE"
+  //       ? setBRM(447.593 + 9.247 * weight + 3.098 * height - 4.33 * age)
+  //       : setBRM(88.362 + 13.397 * weight + 4.799 * height - 5.677 * age);
+  //   }
+  // }, [selectedGender, weight, height, age]);
+
+  const calculateBMR = useCallback(async () => {
+    if (!selectedGender || !weight || !height || !age) return;
+
+    const bmrValue =
+      selectedGender === "FEMALE"
+        ? 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age
+        : 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
+    setBMR(bmrValue);
+  }, [selectedGender, weight, height, age]);
+
+  const calculateTDEE = useCallback(async () => {
+    calculateBMR();
+    if (!selectedActivity || !bmr) return;
+    const tdeeValue = bmr * TDDE_CONSTANTS[selectedActivity];
+    setTDEE(tdeeValue);
+    onErrorChange();
     onDataChange({
       age,
       weight,
       height,
-      bmr: BMRValue,
-      tdee: TDEEValue,
+      bmr,
+      tdee: tdeeValue,
       selectedGender,
       selectedActivity,
+      isError,
     });
-  }, [age, weight, height, selectedGender, selectedActivity]);
+  }, [selectedActivity, bmr, onErrorChange, onDataChange, age, weight, height, selectedGender, isError]);
+
+  // const calculateTDEE = useCallback(
+  //   async (bmr: number) => {
+
+  //     if (!selectedActivity) return 0;
+  //     return bmr * TDDE_CONSTANTS[selectedActivity];
+  //   },
+  //   [selectedActivity]
+  // );
+
+  useEffect(() => {
+    // onErrorChange();
+    // const BMRValue = calculateBMR();
+    // const TDEEValue = calculateTDEE();
+    // const TDEEValue = calculateTDEE(BMRValue);
+
+    // onDataChange({
+    //   age,
+    //   weight,
+    //   height,
+    //   bmr: brm,
+    //   tdee: TDEEValue,
+    //   selectedGender,
+    //   selectedActivity,
+    //   isError,
+    // });
+    const timer = setInterval(calculateTDEE, POLLING_FREQUENCY_MS);
+
+    return () => clearInterval(timer);
+  }, [calculateTDEE]);
 
   return (
     <Card className="flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg gap-2 p-4">

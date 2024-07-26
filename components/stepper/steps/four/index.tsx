@@ -1,5 +1,5 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CaloricIntakeCard from "./CaloricIntakeCard";
 
 interface CaloricIntake {
@@ -68,6 +68,9 @@ interface StepFourProps {
     bodyType: "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null;
   };
 }
+
+const POLLING_FREQUENCY_MS = 1000;
+
 function StepFour({ inputs }: StepFourProps) {
   const [results, setResults] = useState<CaloricIntake[]>(
     initialCaloricIntakes
@@ -81,7 +84,7 @@ function StepFour({ inputs }: StepFourProps) {
   const [fatGrams, setFatGrams] = useState<number>(0);
   const { bodyType, tdee, weight } = inputs;
 
-  const handleTDCIChange = () => {
+  const handleTDCIChange = useCallback(async () => {
     // Target daily calorie intake (TDCI)
 
     if (tdee && weight && bodyType) {
@@ -99,10 +102,11 @@ function StepFour({ inputs }: StepFourProps) {
       setFatKcal(Math.round((tdci * percentages.FAT) / 100));
       setFatGrams(fatGrams / KCAL_TO_GRAMS_CONSTANTS.FAT);
     }
-  };
+  }, [tdee, weight, bodyType, tdci, proteinKcal, carbKcal, fatGrams]);
 
   useEffect(() => {
     handleTDCIChange();
+    const timer = setInterval(handleTDCIChange, POLLING_FREQUENCY_MS);
 
     setResults([
       {
@@ -127,7 +131,17 @@ function StepFour({ inputs }: StepFourProps) {
         total: tdci,
       },
     ]);
-  }, [tdci, proteinKcal, carbKcal, fatKcal, proteinGrams, carbGrams, fatGrams]);
+    return () => clearInterval(timer);
+  }, [
+    tdci,
+    proteinKcal,
+    carbKcal,
+    fatKcal,
+    proteinGrams,
+    carbGrams,
+    fatGrams,
+    handleTDCIChange,
+  ]);
 
   return (
     <Card className="flex flex-col p-4 border border-gray-100 rounded-lg cursor-pointer items-center gap-4 w-96 h-72">
