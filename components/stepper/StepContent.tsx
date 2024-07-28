@@ -2,10 +2,11 @@ import StepOne from "./steps/one";
 import StepTwo from "./steps/two";
 import StepThree from "./steps/three";
 import StepFour from "./steps/four";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface StepContentProps {
   step: number;
+  onErrors: null;
 }
 interface StepOneData {
   age: number | null;
@@ -18,7 +19,7 @@ interface StepOneData {
   isError: boolean;
 }
 
-function StepContent({ step }: StepContentProps) {
+function StepContent({ step, onErrors }: StepContentProps) {
   const [expectation, setExpectation] = useState<
     "BUILD" | "RECOMPOSITION" | null
   >(null);
@@ -43,30 +44,35 @@ function StepContent({ step }: StepContentProps) {
     bodyType: bodyType,
   };
 
-  const handleDataChange = (data: {
-    age: number | null;
-    weight: number | null;
-    height: number | null;
-    bmr: number | null;
-    tdee: number | null;
-    selectedGender: "MALE" | "FEMALE" | null;
-    selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
-    isError: boolean;
-  }) => {
-    setStepOneData(data);
-  };
+  const handleDataChange = useCallback(
+    async (data: {
+      age: number | null;
+      weight: number | null;
+      height: number | null;
+      bmr: number | null;
+      tdee: number | null;
+      selectedGender: "MALE" | "FEMALE" | null;
+      selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
+      isError: boolean;
+    }) => {
+      setStepOneData(data);
+    },
+    []
+  );
 
-  console.log({ stepOneData });
-  const handleExpectationChange = (
-    expectation: "BUILD" | "RECOMPOSITION" | null
-  ) => {
-    setExpectation(expectation);
-  };
-  const handleBodyTypeChange = (
-    bodyType: "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null
-  ) => {
-    setBodyType(bodyType);
-  };
+  // console.log({ stepOneData });
+  const handleExpectationChange = useCallback(
+    async (expectation: "BUILD" | "RECOMPOSITION" | null) => {
+      setExpectation(expectation);
+    },
+    []
+  );
+  const handleBodyTypeChange = useCallback(
+    async (bodyType: "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null) => {
+      setBodyType(bodyType);
+    },
+    []
+  );
 
   return (
     <div className="flex items-center ">

@@ -144,7 +144,17 @@ function StepOne({ onDataChange }: StepOneProps) {
       selectedActivity,
       isError,
     });
-  }, [selectedActivity, bmr, onErrorChange, onDataChange, age, weight, height, selectedGender, isError]);
+  }, [
+    selectedActivity,
+    bmr,
+    onErrorChange,
+    onDataChange,
+    age,
+    weight,
+    height,
+    selectedGender,
+    isError,
+  ]);
 
   // const calculateTDEE = useCallback(
   //   async (bmr: number) => {
