@@ -2,13 +2,13 @@ import StepOne from "./steps/one";
 import StepTwo from "./steps/two";
 import StepThree from "./steps/three";
 import StepFour from "./steps/four";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-const POLLING_FREQUENCY_MS = 1000;
 interface StepContentProps {
   step: number;
-  HandleStepCompleted: React.Dispatch<React.SetStateAction<boolean>>;
-  HandleCurrentStep: React.Dispatch<React.SetStateAction<number>>;
+  HandleStepCompleted: (isCompleted: boolean) => void;
+  HandleCurrentStep: (nextStep: number) => void;
+  onBackStep: () => void;
 }
 interface StepOneData {
   age: number | null;
@@ -21,10 +21,8 @@ function StepContent({
   step,
   HandleStepCompleted,
   HandleCurrentStep,
+  onBackStep,
 }: StepContentProps) {
-
-  const [currentStep, setCurrentStep] = useState(1);
-  const [complete, setComplete] = useState(false);
   const [expectation, setExpectation] = useState<
     "BUILD" | "RECOMPOSITION" | null
   >(null);
@@ -39,61 +37,71 @@ function StepContent({
     gender: null,
     activity: null,
   });
-  console.log("stepOneData in Content", stepOneData);
+  // console.log("stepOneData in Content", stepOneData);
 
   const inputs = {
     ...stepOneData,
-    expectation: expectation,
-    bodyType: bodyType,
+    expectation,
+    bodyType,
   };
+  console.log("inputs in Content", inputs);
 
-  const handleStepOneDataChange = useCallback(
-    async (data: {
-      age: number | null;
-      weight: number | null;
-      height: number | null;
-      gender: "MALE" | "FEMALE" | null;
-      activity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
-    }) => {
-      setStepOneData(data);
-    },
-    []
-  );
+  const handleStepOneDataChange = useCallback((data: StepOneData) => {
+    setStepOneData(data);
+  }, []);
 
   // console.log({ stepOneData });
   const handleStepTwoDataChange = useCallback(
-    async (expectation: "BUILD" | "RECOMPOSITION" | null) => {
+    (expectation: "BUILD" | "RECOMPOSITION" | null) => {
       setExpectation(expectation);
     },
     []
   );
   const handleStepThreeDataChange = useCallback(
-    async (bodyType: "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null) => {
+    (bodyType: "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null) => {
       setBodyType(bodyType);
     },
     []
   );
-  const nextStep = () => {
-    console.log("nextStep");
+
+  const handleStepSubmitSuccess = (isCompleted: boolean) => {
+    HandleStepCompleted(isCompleted);
+    if (isCompleted) {
+      HandleCurrentStep(step + 1);
+    }
   };
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      handleStepOneDataChange;
-    }, POLLING_FREQUENCY_MS);
-    return () => clearTimeout(timer);
-  }, [handleStepOneDataChange]);
+
+  const handleStepBack = () => {
+    if (step > 1) {
+      onBackStep();
+    }
+  };
 
   return (
     <div className="flex items-center ">
       {step === 1 && (
         <StepOne
           onDataChange={handleStepOneDataChange}
-          onStepSubmitSuccess={HandleStepCompleted}
+          onStepSubmitSuccess={handleStepSubmitSuccess}
           onStepSuccess={HandleCurrentStep}
         />
       )}
-      {step === 2 && <StepTwo onExpectationChange={handleStepTwoDataChange} />}
-      {step === 3 && <StepThree onBodyTypeChange={handleStepThreeDataChange} />}
+      {step === 2 && (
+        <StepTwo
+          onExpectationChange={handleStepTwoDataChange}
+          onStepSubmitSuccess={handleStepSubmitSuccess}
+          onStepSuccess={HandleCurrentStep}
+          onStepBack={handleStepBack}
+        />
+      )}
+      {step === 3 && (
+        <StepThree
+          onBodyTypeChange={handleStepThreeDataChange}
+          onStepSubmitSuccess={handleStepSubmitSuccess}
+          onStepSuccess={HandleCurrentStep}
+          onStepBack={handleStepBack}
+        />
+      )}
       {step === 4 && <StepFour inputs={inputs} />}
     </div>
   );

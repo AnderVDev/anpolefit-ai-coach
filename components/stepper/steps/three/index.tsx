@@ -4,7 +4,24 @@ import OptionsCard from "../../OptionsCard";
 import ectomorphBody from "@/app/assets/Ectomorph_body.jpg";
 import mesomorphBody from "@/app/assets/Mesomorph_body.jpg";
 import endomorphBody from "@/app/assets/Endomorph_body.png";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 
+const formSchema = z.object({
+  bodyType: z.enum(["ECTOMORPH", "MESOMORPH", "ENDOMORPH"], {
+    message: "Must select a Body Type",
+  }),
+});
+type FormSchema = z.infer<typeof formSchema>;
 type BodiesTypes = "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH";
 const bodiesTypes = [
   {
@@ -32,9 +49,26 @@ const bodiesTypes = [
 
 interface StepThreeProps {
   onBodyTypeChange: (bodyType: BodiesTypes | null) => void;
+  onStepSubmitSuccess: (isCompleted: boolean) => void;
+  onStepSuccess: (nextStep: number) => void;
+  onStepBack: () => void;
 }
 
-function StepThree({ onBodyTypeChange }: StepThreeProps) {
+function StepThree({
+  onBodyTypeChange,
+  onStepSubmitSuccess,
+  onStepSuccess,
+  onStepBack,
+}: StepThreeProps) {
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      bodyType: null,
+    },
+  });
+  const { watch, setValue, handleSubmit, control } = form;
+
+  const watchAllFields = watch();
   const [selectedBodyType, setSelectedBodyType] = useState<BodiesTypes | null>(
     null
   );
@@ -43,29 +77,65 @@ function StepThree({ onBodyTypeChange }: StepThreeProps) {
     setSelectedBodyType(bodyTypeId);
   };
 
-  useEffect(() => {
-    const bodyType= onBodyTypeChange(selectedBodyType);
+  // useEffect(() => {
+  //   const bodyType = onBodyTypeChange(selectedBodyType);
 
+  //   // Clean up on unmount
+  //   // return () => clearInterval(bodyType);
+  // }, [selectedBodyType]);
 
-    // Clean up on unmount
-    // return () => clearInterval(bodyType);
-  }, [selectedBodyType]);
+  const onSubmit: SubmitHandler<FormSchema> = () => {
+    const { bodyType } = watchAllFields;
+    onBodyTypeChange(bodyType);
+
+    onStepSubmitSuccess(true);
+  };
 
   return (
-    <Card className="cursor-pointer gap-0 border border-gray-200 rounded-lg">
-      <div className=" grid grid-col-1 justify-items-center md:grid-cols-3 overflow-hidden">
-        {bodiesTypes.map((type) => (
-          <OptionsCard
-            key={type.id}
-            name={type.name}
-            description={type.description}
-            image={type.image}
-            selected={type.id === selectedBodyType}
-            onSelect={() => handleSelectBodyType(type.id as BodiesTypes)}
-          />
-        ))}
-      </div>
-    </Card>
+    <Form {...form}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex items-center justify-center flex-col flex-grow p-4 gap-2"
+      >
+        <FormField
+          control={control}
+          name="bodyType"
+          render={({ field }: any) => (
+            <FormItem className="flex flex-col items-center justify-center my-2">
+              {/* <FormLabel className="text-base font-bold">Expectation</FormLabel> */}
+              <FormControl>
+                <Card className="cursor-pointer gap-0 border border-gray-200 rounded-lg">
+                  <div className=" grid grid-col-1 justify-items-center md:grid-cols-3 overflow-hidden">
+                    {bodiesTypes.map((type) => (
+                      <OptionsCard
+                        key={type.id}
+                        name={type.name}
+                        description={type.description}
+                        image={type.image}
+                        selected={type.id === field.value}
+                        onSelect={() => {
+                          field.onChange(type.id);
+                          handleSelectBodyType(type.id as BodiesTypes);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </Card>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <section className="flex gap-2">
+          <Button className="bg-gray-200 rounded-lg m-0 " onClick={onStepBack}>
+            Back
+          </Button>
+          <Button className="bg-gray-500 rounded-lg m-0 " type="submit">
+            Next
+          </Button>
+        </section>
+      </form>
+    </Form>
   );
 }
 

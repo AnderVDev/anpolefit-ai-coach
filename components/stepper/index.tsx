@@ -10,17 +10,30 @@ const Stepper = () => {
   const [complete, setComplete] = useState(false);
 
   const handleStepCompleted = (isCompleted: boolean) => {
-    setComplete(isCompleted);
+    if (isCompleted) {
+      setComplete(true);
+    }
   };
 
   const handleCurrentStep = (nextStep: number) => {
-    setCurrentStep(nextStep);
+    if (nextStep > 0 && nextStep <= steps.length) {
+      setCurrentStep(nextStep);
+      if (nextStep === steps.length) {
+        setComplete(true);
+      } else {
+        setComplete(false);
+      }
+    }
   };
 
-  
+
+  const handleBackStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
   return (
     <div className="flex flex-col items-center">
-      <div className="flex justify-between mb-4 ">
+      <div className="flex justify-between mb-4">
         {steps.map((step, i) => (
           <div
             key={i}
@@ -54,8 +67,9 @@ const Stepper = () => {
       </div>
       <StepContent
         step={currentStep}
-        HandleStepCompleted={setComplete}
-        HandleCurrentStep={setCurrentStep}
+        HandleStepCompleted={handleStepCompleted}
+        HandleCurrentStep={handleCurrentStep}
+        onBackStep={handleBackStep}
       />
       {/* <Button
         className="bg-gray-500 rounded-lg"

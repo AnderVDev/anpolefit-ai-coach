@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import Metrics from "./Metrics";
 import ActivityCard from "@/components/ActivityCard";
 import { UserRound } from "lucide-react";
@@ -7,7 +7,7 @@ import GenderCard from "./GenderCard";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -80,8 +80,8 @@ interface StepOneProps {
     gender: GendersTypes | null;
     activity: Activities | null;
   }) => void;
-  onStepSubmitSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-  onStepSuccess: React.Dispatch<React.SetStateAction<number>>;
+  onStepSubmitSuccess: (isCompleted: boolean) => void;
+  onStepSuccess: (nextStep: number) => void;
 }
 
 function StepOne({
@@ -92,17 +92,16 @@ function StepOne({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      gender: undefined,
+      gender: null,
       age: 0,
       metrics: {
-        weight: undefined,
-        height: undefined,
+        weight: null,
+        height: null,
       },
-      activity: undefined,
+      activity: null,
     },
   });
-
-  const { watch, setValue } = form;
+  const { watch, setValue, handleSubmit, control } = form;
 
   const watchAllFields = watch();
 
@@ -114,7 +113,7 @@ function StepOne({
     setValue("activity", activityId);
   };
 
-  const onSubmit = () =>
+  const onSubmit: SubmitHandler<FormSchema> = () =>
     // values: FormSchema,
     // e: React.FormEvent<HTMLFormElement>
     {
@@ -128,13 +127,13 @@ function StepOne({
         activity: activity,
       });
       onStepSubmitSuccess(true);
-      onStepSuccess((prev) => prev + 1);
+      // onStepSuccess(2);
       // console.log("Form values", values);
     };
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex items-center justify-center flex-col flex-grow p-4 gap-2"
       >
         <Card className="flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg gap-2 px-2 m-0">
@@ -142,7 +141,7 @@ function StepOne({
             <div className="items-center w-60 h-48 flex flex-col md:col-start-1 md:col-span-1 place-content-between  ">
               <Card className="flex items-center flex-col border border-gray-200 rounded-lg cursor-pointer p-0 h-28 w-60">
                 <FormField
-                  control={form.control}
+                  control={control}
                   name="gender"
                   render={({ field }: any) => (
                     <FormItem className="flex flex-col items-center justify-center my-2">
@@ -173,7 +172,7 @@ function StepOne({
 
               <Card className="flex items-center justify-center flex-col md:flex-row border  md:gap-4 border-gray-200 rounded-lg cursor-pointer mt-2 p-0 h-28 md:h-24 w-60">
                 <FormField
-                  control={form.control}
+                  control={control}
                   name="age"
                   render={({ field }: any) => (
                     <FormItem className="flex flex-col items-center justify-center">
@@ -203,7 +202,7 @@ function StepOne({
             {/* Metrics */}
             <Card className="w-60 p-2 mt-2 md:mt-0 md:mr-1 flex items-center justify-center flex-col flex-grow md:w-80 md:h-48 mx-auto  md:col-end-4 md:col-span-2  border border-gray-200 rounded-lg cursor-pointer ">
               <FormField
-                control={form.control}
+                control={control}
                 name="metrics"
                 render={({ field }: any) => (
                   <FormItem>
@@ -229,7 +228,7 @@ function StepOne({
           <Card className=" w-60 h-auto mb-2 md:w-[590px] flex flex-col items-center justify-center border border-gray-200 rounded-lg cursor-pointer ">
             <section className="w-60 md:w-[590px] grid grid-col-1 justify-between">
               <FormField
-                control={form.control}
+                control={control}
                 name="activity"
                 render={({ field }: any) => (
                   <FormItem className="w-60 md:w-[590px] flex flex-wrap flex-col items-center justify-center mb-1">
