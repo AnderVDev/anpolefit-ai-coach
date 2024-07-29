@@ -1,4 +1,4 @@
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import React, { useCallback, useEffect, useState } from "react";
 import Metrics from "./Metrics";
 import ActivityCard from "@/components/ActivityCard";
@@ -80,9 +80,6 @@ const TDDE_CONSTANTS = {
   EXTREMELY: 1.9,
 };
 
-const cardStyle =
-  "flex items-center flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center w-80 h-48";
-
 interface StepOneProps {
   onDataChange: (data: {
     age: number | null;
@@ -90,9 +87,8 @@ interface StepOneProps {
     height: number | null;
     bmr: number | null;
     tdee: number | null;
-    selectedGender: GendersTypes | null;
-    selectedActivity: Activities | null;
-    isError: boolean;
+    gender: GendersTypes | null;
+    activity: Activities | null;
   }) => void;
 }
 const POLLING_FREQUENCY_MS = 1000;
@@ -101,23 +97,33 @@ function StepOne({ onDataChange }: StepOneProps) {
   //states
   const [bmr, setBMR] = useState<number | null>(null);
   const [tdee, setTDEE] = useState<number | null>(null);
+  const [data, setData] = useState<any | null>({
+    age: null,
+    weight: null,
+    height: null,
+    bmr: null,
+    tdee: null,
+    gender: null,
+    activity: null,
+  });
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      gender: "",
-      age: 0,
+      gender: undefined,
+      age: undefined,
       metrics: {
-        weight: 0,
-        height: 0,
+        weight: undefined,
+        height: undefined,
       },
-      activity: "",
+      activity: undefined,
     },
   });
 
   const { watch, setValue } = form;
 
   const watchAllFields = watch();
+  // const { gender, metrics, age, activity } = watchAllFields;
 
   const handleSelectGender = (genderId: GendersTypes) => {
     setValue("gender", genderId);
@@ -128,7 +134,7 @@ function StepOne({ onDataChange }: StepOneProps) {
   };
 
   const calculateBMR = (
-    gender: string,
+    gender: GendersTypes,
     weight: number,
     height: number,
     age: number
@@ -140,8 +146,8 @@ function StepOne({ onDataChange }: StepOneProps) {
     }
   };
 
-  const calculateTDEE = (bmr: number, activity: string) => {
-    return bmr * TDDE_CONSTANTS[activity as keyof typeof TDDE_CONSTANTS];
+  const calculateTDEE = (bmr: number, activity: Activities) => {
+    return bmr * TDDE_CONSTANTS[activity];
   };
 
   useEffect(() => {
@@ -159,17 +165,39 @@ function StepOne({ onDataChange }: StepOneProps) {
         const tdeeValue = calculateTDEE(bmrValue, activity);
         setTDEE(tdeeValue);
       }
+
+      setData({
+        age,
+        weight: metrics.weight,
+        height: metrics.height,
+        bmr: bmr,
+        tdee: tdee,
+        gender,
+        activity,
+      });
+
+      onDataChange({
+        age,
+        weight: metrics.weight,
+        height: metrics.height,
+        bmr: bmr,
+        tdee: tdee,
+        gender,
+        activity,
+      });
     }
     console.log({ bmr, tdee });
-  }, [watchAllFields]);
+    console.log("data", data);
+  }, [watchAllFields, bmr, tdee]);
 
-  function onSubmit(values: FormSchema, e: React.FormEvent<HTMLFormElement>) {
+  const onSubmit = (
+    values: FormSchema,
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
 
+    console.log("Form values", values);
+  };
   return (
     <Form {...form}>
       <form
