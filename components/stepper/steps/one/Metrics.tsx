@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 
@@ -10,6 +10,41 @@ interface MetricsProps {
   onHeightChange: (value: number) => void;
 }
 function Metrics({ onWeightChange, onHeightChange }: MetricsProps) {
+  const [unitSystem, setUnitSystem] = useState("metric");
+
+  const handleHeightChangeMetric = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value)) {
+      onHeightChange(value); // value in cm
+    }
+  };
+
+  const handleWeightChangeMetric = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value)) {
+      onWeightChange(value); // value in kg
+    }
+  };
+
+  const handleHeightChangeImperial = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    unit: "ft" | "in"
+  ) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value)) {
+      const heightInCm = unit === "ft" ? value * 30.48 : value * 2.54;
+      onHeightChange(heightInCm); // convert to cm
+    }
+  };
+
+  const handleWeightChangeImperial = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value)) {
+      const weightInKg = value * 0.453592;
+      onWeightChange(weightInKg); // convert to kg
+    }
+  };
+
   return (
     <Tabs defaultValue="metric" className="flex flex-col items-center w-full ">
       <TabsList>
@@ -27,13 +62,15 @@ function Metrics({ onWeightChange, onHeightChange }: MetricsProps) {
                 className="w-16 h-6"
                 type="text"
                 placeholder="ft"
-                onChange={(e) => onHeightChange(parseFloat(e.target.value))}
+                onChange={(e) => handleHeightChangeImperial(e, "ft")}
+                // onChange={(e) => onHeightChange(parseFloat(e.target.value))}
               />
               <Input
                 className="w-16 h-6"
                 type="text"
                 placeholder="inch"
-                onChange={(e) => onHeightChange(parseFloat(e.target.value))}
+                onChange={(e) => handleHeightChangeImperial(e, "in")}
+                // onChange={(e) => onHeightChange(parseFloat(e.target.value))}
               />
             </div>
           </div>
@@ -44,7 +81,8 @@ function Metrics({ onWeightChange, onHeightChange }: MetricsProps) {
               className="w-16 h-6"
               type="text"
               placeholder="lbs"
-              onChange={(e) => onWeightChange(parseFloat(e.target.value))}
+              onChange={handleWeightChangeImperial}
+              // onChange={(e) => onWeightChange(parseFloat(e.target.value))}
             />
           </div>
         </div>
@@ -59,7 +97,8 @@ function Metrics({ onWeightChange, onHeightChange }: MetricsProps) {
               className="w-16 h-6"
               type="text"
               placeholder="cm"
-              onChange={(e) => onHeightChange(parseFloat(e.target.value))}
+              onChange={handleHeightChangeMetric}
+              // onChange={(e) => onHeightChange(parseFloat(e.target.value))}
             />
           </div>
 
@@ -69,7 +108,8 @@ function Metrics({ onWeightChange, onHeightChange }: MetricsProps) {
               className="w-16 h-6"
               type="text"
               placeholder="kg"
-              onChange={(e) => onWeightChange(parseFloat(e.target.value))}
+              onChange={handleWeightChangeMetric}
+              // onChange={(e) => onWeightChange(parseFloat(e.target.value))}
             />
           </div>
         </div>

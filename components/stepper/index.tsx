@@ -70,14 +70,6 @@ const Stepper = () => {
       >
         {currentStep >= steps.length - 1 ? "Finish" : "Next"}
       </Button>
-
-      <Alert variant="destructive">
-        <TriangleAlert className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Your session has expired. Please log in again.
-        </AlertDescription>
-      </Alert>
     </div>
   );
 };

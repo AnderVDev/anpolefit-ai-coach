@@ -108,16 +108,6 @@ function StepOne({ onDataChange }: StepOneProps) {
     }
   }, [age, height, selectedActivity, selectedGender, weight]);
 
-  // const calculateBMR = useCallback(async () => {
-  //   if (!selectedGender || !weight || !height) return 0;
-
-  //   if (age) {
-  //     return selectedGender === "FEMALE"
-  //       ? setBRM(447.593 + 9.247 * weight + 3.098 * height - 4.33 * age)
-  //       : setBRM(88.362 + 13.397 * weight + 4.799 * height - 5.677 * age);
-  //   }
-  // }, [selectedGender, weight, height, age]);
-
   const calculateBMR = useCallback(async () => {
     if (!selectedGender || !weight || !height || !age) return;
 
@@ -156,31 +146,7 @@ function StepOne({ onDataChange }: StepOneProps) {
     isError,
   ]);
 
-  // const calculateTDEE = useCallback(
-  //   async (bmr: number) => {
-
-  //     if (!selectedActivity) return 0;
-  //     return bmr * TDDE_CONSTANTS[selectedActivity];
-  //   },
-  //   [selectedActivity]
-  // );
-
   useEffect(() => {
-    // onErrorChange();
-    // const BMRValue = calculateBMR();
-    // const TDEEValue = calculateTDEE();
-    // const TDEEValue = calculateTDEE(BMRValue);
-
-    // onDataChange({
-    //   age,
-    //   weight,
-    //   height,
-    //   bmr: brm,
-    //   tdee: TDEEValue,
-    //   selectedGender,
-    //   selectedActivity,
-    //   isError,
-    // });
     const timer = setInterval(calculateTDEE, POLLING_FREQUENCY_MS);
 
     return () => clearInterval(timer);
@@ -188,7 +154,7 @@ function StepOne({ onDataChange }: StepOneProps) {
 
   return (
     <Card className="flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg gap-2 p-4">
-      <div className="md:w-[590px] grid grid-col-1 md:grid-cols-3 justify-between">
+      <div className="w-60 md:w-[590px] grid grid-col-1 md:grid-cols-3 justify-between">
         <div className="md:col-start-1 md:col-span-1 flex justify-between place-content-between flex-col items-center w-64 h-48">
           <Card className={`${cardStyle} p-0 h-28 w-60`}>
             <CardTitle className="my-2 text-base">Gender</CardTitle>
@@ -204,6 +170,7 @@ function StepOne({ onDataChange }: StepOneProps) {
               ))}
             </CardContent>
           </Card>
+
           <Card className="flex items-center flex-col md:flex-row border justify-center md:gap-4 border-gray-200 rounded-lg cursor-pointer mt-2 p-0 h-28 md:h-24 w-60">
             <CardTitle className="my-2 text-base">Age</CardTitle>
             <CardContent className=" flex flex-col gap-1 items-center p-0">
