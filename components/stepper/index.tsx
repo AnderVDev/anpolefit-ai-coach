@@ -1,19 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import { Check, TriangleAlert } from "lucide-react";
+import { Check } from "lucide-react";
 import StepContent from "./StepContent";
-import { Button } from "../ui/button";
-interface StepErrorProps {
-  stepOneError: boolean;
-  stepTwoError: boolean;
-  stepThreeError: boolean;
-  stepFourError: boolean;
-}
+// import { Button } from "../ui/button";
+
 const Stepper = () => {
   const steps = ["About You", "Expectations", "Body Type", "Results"];
   const [currentStep, setCurrentStep] = useState(1);
   const [complete, setComplete] = useState(false);
 
+  const handleStepCompleted = (isCompleted: boolean) => {
+    setComplete(isCompleted);
+  };
+
+  const handleCurrentStep = (nextStep: number) => {
+    setCurrentStep(nextStep);
+  };
+
+  
   return (
     <div className="flex flex-col items-center">
       <div className="flex justify-between mb-4 ">
@@ -48,8 +52,12 @@ const Stepper = () => {
           </div>
         ))}
       </div>
-      <StepContent step={currentStep} />
-      <Button
+      <StepContent
+        step={currentStep}
+        HandleStepCompleted={setComplete}
+        HandleCurrentStep={setCurrentStep}
+      />
+      {/* <Button
         className="bg-gray-500 rounded-lg"
         onClick={() => {
           currentStep === steps.length
@@ -58,7 +66,7 @@ const Stepper = () => {
         }}
       >
         {currentStep >= steps.length - 1 ? "Finish" : "Next"}
-      </Button>
+      </Button> */}
     </div>
   );
 };

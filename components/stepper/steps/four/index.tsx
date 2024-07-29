@@ -2,6 +2,16 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import React, { useCallback, useEffect, useState } from "react";
 import CaloricIntakeCard from "./CaloricIntakeCard";
 
+type GendersTypes = "MALE" | "FEMALE";
+type Activities = "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY";
+const TDDE_CONSTANTS = {
+  SEDENTARY: 1.2,
+  LIGHT: 1.375,
+  MODERATE: 1.55,
+  VERY: 1.725,
+  EXTREMELY: 1.9,
+};
+
 interface CaloricIntake {
   id: string;
   name: string;
@@ -60,10 +70,8 @@ interface StepFourProps {
     age: number | null;
     weight: number | null;
     height: number | null;
-    bmr: number | null;
-    tdee: number | null;
-    selectedGender: "MALE" | "FEMALE" | null;
-    selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
+    gender: "MALE" | "FEMALE" | null;
+    activity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
     expectation: "BUILD" | "RECOMPOSITION" | null;
     bodyType: "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null;
   };
@@ -72,6 +80,8 @@ interface StepFourProps {
 const POLLING_FREQUENCY_MS = 1000;
 
 function StepFour({ inputs }: StepFourProps) {
+  const [bmr, setBMR] = useState<number | null>(null);
+  const [tdee, setTDEE] = useState<number | null>(null);
   const [results, setResults] = useState<CaloricIntake[]>(
     initialCaloricIntakes
   );
@@ -82,9 +92,37 @@ function StepFour({ inputs }: StepFourProps) {
   const [carbGrams, setCarbGrams] = useState<number>(0);
   const [fatKcal, setFatKcal] = useState<number>(0);
   const [fatGrams, setFatGrams] = useState<number>(0);
-  const { bodyType, tdee, weight } = inputs;
+  const { bodyType, weight, gender, activity, height, age } = inputs;
+
+  const calculateBMR = (
+    gender: GendersTypes,
+    weight: number,
+    height: number,
+    age: number
+  ) => {
+    if (gender === "FEMALE") {
+      return 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
+    } else {
+      return 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
+    }
+  };
+
+  const calculateTDEE = (bmr: number, activity: Activities) => {
+    return bmr * TDDE_CONSTANTS[activity];
+  };
 
   const handleTDCIChange = useCallback(async () => {
+    if (gender && weight && height && age) {
+      const bmrValue = calculateBMR(gender, weight, height, age);
+      setBMR(bmrValue);
+
+    }
+
+    if (bmr && activity) {
+      const tdeeValue = calculateTDEE(bmr, activity);
+      setTDEE(tdeeValue);
+    }
+
     // Target daily calorie intake (TDCI)
 
     if (tdee && weight && bodyType) {
@@ -102,7 +140,7 @@ function StepFour({ inputs }: StepFourProps) {
       setFatKcal(Math.round((tdci * percentages.FAT) / 100));
       setFatGrams(fatGrams / KCAL_TO_GRAMS_CONSTANTS.FAT);
     }
-  }, [tdee, weight, bodyType, tdci, proteinKcal, carbKcal, fatGrams]);
+  }, [gender, weight, height, age, bmr, activity, tdee, bodyType, tdci, proteinKcal, carbKcal, fatGrams]);
 
   useEffect(() => {
     handleTDCIChange();

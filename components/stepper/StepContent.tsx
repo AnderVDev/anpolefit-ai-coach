@@ -7,30 +7,35 @@ import { useCallback, useEffect, useState } from "react";
 const POLLING_FREQUENCY_MS = 1000;
 interface StepContentProps {
   step: number;
+  HandleStepCompleted: React.Dispatch<React.SetStateAction<boolean>>;
+  HandleCurrentStep: React.Dispatch<React.SetStateAction<number>>;
 }
 interface StepOneData {
   age: number | null;
   weight: number | null;
   height: number | null;
-  bmr: number | null;
-  tdee: number | null;
   gender: "MALE" | "FEMALE" | null;
   activity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
 }
-function StepContent({ step }: StepContentProps) {
+function StepContent({
+  step,
+  HandleStepCompleted,
+  HandleCurrentStep,
+}: StepContentProps) {
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [complete, setComplete] = useState(false);
   const [expectation, setExpectation] = useState<
-  "BUILD" | "RECOMPOSITION" | null
+    "BUILD" | "RECOMPOSITION" | null
   >(null);
   const [bodyType, setBodyType] = useState<
-  "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null
+    "ECTOMORPH" | "MESOMORPH" | "ENDOMORPH" | null
   >(null);
 
   const [stepOneData, setStepOneData] = useState<StepOneData>({
     age: null,
     weight: null,
     height: null,
-    bmr: null,
-    tdee: null,
     gender: null,
     activity: null,
   });
@@ -47,8 +52,6 @@ function StepContent({ step }: StepContentProps) {
       age: number | null;
       weight: number | null;
       height: number | null;
-      bmr: number | null;
-      tdee: number | null;
       gender: "MALE" | "FEMALE" | null;
       activity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
     }) => {
@@ -70,22 +73,25 @@ function StepContent({ step }: StepContentProps) {
     },
     []
   );
-  useEffect(()=>{
+  const nextStep = () => {
+    console.log("nextStep");
+  };
+  useEffect(() => {
     const timer = setTimeout(() => {
       handleStepOneDataChange;
     }, POLLING_FREQUENCY_MS);
     return () => clearTimeout(timer);
-  },[handleStepOneDataChange])
-
-  // const HandleDataChange = useCallback(async () => {
-  //   handleStepOneDataChange()
-  //   handleStepTwoDataChange()
-  //   handleStepThreeDataChange()
-  // }, []);
+  }, [handleStepOneDataChange]);
 
   return (
     <div className="flex items-center ">
-      {step === 1 && <StepOne onDataChange={handleStepOneDataChange} />}
+      {step === 1 && (
+        <StepOne
+          onDataChange={handleStepOneDataChange}
+          onStepSubmitSuccess={HandleStepCompleted}
+          onStepSuccess={HandleCurrentStep}
+        />
+      )}
       {step === 2 && <StepTwo onExpectationChange={handleStepTwoDataChange} />}
       {step === 3 && <StepThree onBodyTypeChange={handleStepThreeDataChange} />}
       {step === 4 && <StepFour inputs={inputs} />}

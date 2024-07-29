@@ -25,11 +25,11 @@ const formSchema = z.object({
       required_error: "Age is required",
       invalid_type_error: "Age must be a number greater than 10",
     })
-    .min(10, { message: "Must greater than 10" })
-    .max(90, { message: "Must less than 10" }),
+    .min(10, { message: "Must be greater than 10" })
+    .max(90, { message: "Must be less than 90" }),
   metrics: z.object({
-    weight: z.number({ required_error: "error metric" }).positive(),
-    height: z.number({ required_error: "error metric" }).positive(),
+    weight: z.number({ required_error: "Weight is required" }).positive(),
+    height: z.number({ required_error: "Height is required" }).positive(),
   }),
   activity: z.enum(["SEDENTARY", "LIGHT", "MODERATE", "VERY"], {
     message: "Must select an Activity",
@@ -72,46 +72,28 @@ const activities = [
   },
 ];
 
-const TDDE_CONSTANTS = {
-  SEDENTARY: 1.2,
-  LIGHT: 1.375,
-  MODERATE: 1.55,
-  VERY: 1.725,
-  EXTREMELY: 1.9,
-};
-
 interface StepOneProps {
   onDataChange: (data: {
     age: number | null;
     weight: number | null;
     height: number | null;
-    bmr: number | null;
-    tdee: number | null;
     gender: GendersTypes | null;
     activity: Activities | null;
   }) => void;
+  onStepSubmitSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+  onStepSuccess: React.Dispatch<React.SetStateAction<number>>;
 }
-const POLLING_FREQUENCY_MS = 1000;
 
-function StepOne({ onDataChange }: StepOneProps) {
-  //states
-  const [bmr, setBMR] = useState<number | null>(null);
-  const [tdee, setTDEE] = useState<number | null>(null);
-  const [data, setData] = useState<any | null>({
-    age: null,
-    weight: null,
-    height: null,
-    bmr: null,
-    tdee: null,
-    gender: null,
-    activity: null,
-  });
-
+function StepOne({
+  onDataChange,
+  onStepSubmitSuccess,
+  onStepSuccess,
+}: StepOneProps) {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       gender: undefined,
-      age: undefined,
+      age: 0,
       metrics: {
         weight: undefined,
         height: undefined,
@@ -123,7 +105,6 @@ function StepOne({ onDataChange }: StepOneProps) {
   const { watch, setValue } = form;
 
   const watchAllFields = watch();
-  // const { gender, metrics, age, activity } = watchAllFields;
 
   const handleSelectGender = (genderId: GendersTypes) => {
     setValue("gender", genderId);
@@ -133,71 +114,23 @@ function StepOne({ onDataChange }: StepOneProps) {
     setValue("activity", activityId);
   };
 
-  const calculateBMR = (
-    gender: GendersTypes,
-    weight: number,
-    height: number,
-    age: number
-  ) => {
-    if (gender === "FEMALE") {
-      return 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
-    } else {
-      return 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
-    }
-  };
-
-  const calculateTDEE = (bmr: number, activity: Activities) => {
-    return bmr * TDDE_CONSTANTS[activity];
-  };
-
-  useEffect(() => {
-    const { gender, metrics, age, activity } = watchAllFields;
-    if (gender && metrics.weight && metrics.height && age) {
-      const bmrValue = calculateBMR(
-        gender,
-        metrics.weight,
-        metrics.height,
-        age
-      );
-      setBMR(bmrValue);
-
-      if (activity) {
-        const tdeeValue = calculateTDEE(bmrValue, activity);
-        setTDEE(tdeeValue);
-      }
-
-      setData({
-        age,
-        weight: metrics.weight,
-        height: metrics.height,
-        bmr: bmr,
-        tdee: tdee,
-        gender,
-        activity,
-      });
-
+  const onSubmit = () =>
+    // values: FormSchema,
+    // e: React.FormEvent<HTMLFormElement>
+    {
+      const { age, metrics, gender, activity } = watchAllFields;
+      // e.preventDefault();
       onDataChange({
-        age,
+        age: age,
         weight: metrics.weight,
         height: metrics.height,
-        bmr: bmr,
-        tdee: tdee,
-        gender,
-        activity,
+        gender: gender,
+        activity: activity,
       });
-    }
-    console.log({ bmr, tdee });
-    console.log("data", data);
-  }, [watchAllFields, bmr, tdee]);
-
-  const onSubmit = (
-    values: FormSchema,
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
-
-    console.log("Form values", values);
-  };
+      onStepSubmitSuccess(true);
+      onStepSuccess((prev) => prev + 1);
+      // console.log("Form values", values);
+    };
   return (
     <Form {...form}>
       <form
@@ -329,7 +262,7 @@ function StepOne({ onDataChange }: StepOneProps) {
         </Card>
 
         <Button className="bg-gray-500 rounded-lg m-0 " type="submit">
-          Submit
+          Next
         </Button>
       </form>
     </Form>
