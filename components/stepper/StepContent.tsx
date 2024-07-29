@@ -6,7 +6,6 @@ import { useCallback, useState } from "react";
 
 interface StepContentProps {
   step: number;
-  onErrors: null;
 }
 interface StepOneData {
   age: number | null;
@@ -16,10 +15,9 @@ interface StepOneData {
   tdee: number | null;
   selectedGender: "MALE" | "FEMALE" | null;
   selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
-  isError: boolean;
 }
 
-function StepContent({ step, onErrors }: StepContentProps) {
+function StepContent({ step }: StepContentProps) {
   const [expectation, setExpectation] = useState<
     "BUILD" | "RECOMPOSITION" | null
   >(null);
@@ -35,7 +33,6 @@ function StepContent({ step, onErrors }: StepContentProps) {
     tdee: null,
     selectedGender: null,
     selectedActivity: null,
-    isError: true,
   });
 
   const inputs = {
@@ -53,7 +50,6 @@ function StepContent({ step, onErrors }: StepContentProps) {
       tdee: number | null;
       selectedGender: "MALE" | "FEMALE" | null;
       selectedActivity: "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY" | null;
-      isError: boolean;
     }) => {
       setStepOneData(data);
     },

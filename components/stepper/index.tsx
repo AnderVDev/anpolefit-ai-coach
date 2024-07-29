@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Check, TriangleAlert } from "lucide-react";
 import StepContent from "./StepContent";
 import { Button } from "../ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 interface StepErrorProps {
   stepOneError: boolean;
   stepTwoError: boolean;
@@ -14,16 +13,6 @@ const Stepper = () => {
   const steps = ["About You", "Expectations", "Body Type", "Results"];
   const [currentStep, setCurrentStep] = useState(1);
   const [complete, setComplete] = useState(false);
-  const [stepError, setStepError] = useState<StepErrorProps>({
-    stepOneError: false,
-    stepTwoError: false,
-    stepThreeError: false,
-    stepFourError: false,
-  });
-
-  const HandleDataErrors = (data: StepErrorProps) => {
-    setStepError(data);
-  };
 
   return (
     <div className="flex flex-col items-center">
@@ -59,7 +48,7 @@ const Stepper = () => {
           </div>
         ))}
       </div>
-      <StepContent step={currentStep} onErrors={HandleDataErrors} />
+      <StepContent step={currentStep} />
       <Button
         className="bg-gray-500 rounded-lg"
         onClick={() => {

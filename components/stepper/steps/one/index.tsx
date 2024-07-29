@@ -5,9 +5,44 @@ import ActivityCard from "@/components/ActivityCard";
 import { UserRound } from "lucide-react";
 import GenderCard from "./GenderCard";
 import { Input } from "@/components/ui/input";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
-const cardStyle =
-  "flex items-center flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center w-80 h-48";
+const formSchema = z.object({
+  gender: z.enum(["MALE", "FEMALE"], { message: "Must select a Gender" }),
+  age: z
+    .number({
+      required_error: "Age is required",
+      invalid_type_error: "Age must be a number greater than 10",
+    })
+    .min(10, { message: "Must greater than 10" })
+    .max(90, { message: "Must less than 10" }),
+  metrics: z.object({
+    weight: z.number({ required_error: "error metric" }).positive(),
+    height: z.number({ required_error: "error metric" }).positive(),
+  }),
+  activity: z.enum(["SEDENTARY", "LIGHT", "MODERATE", "VERY"], {
+    message: "Must select an Activity",
+  }),
+});
+
+type FormSchema = z.infer<typeof formSchema>;
+
+type GendersTypes = "MALE" | "FEMALE";
+const genders = [
+  { id: "MALE", gender: "Male", icon: <UserRound size={16} /> },
+  { id: "FEMALE", gender: "Female", icon: <UserRound size={16} /> },
+];
 
 type Activities = "SEDENTARY" | "LIGHT" | "MODERATE" | "VERY";
 const activities = [
@@ -37,12 +72,6 @@ const activities = [
   },
 ];
 
-type GendersTypes = "MALE" | "FEMALE";
-const genders = [
-  { id: "MALE", gender: "Male", icon: <UserRound size={16} /> },
-  { id: "FEMALE", gender: "Female", icon: <UserRound size={16} /> },
-];
-
 const TDDE_CONSTANTS = {
   SEDENTARY: 1.2,
   LIGHT: 1.375,
@@ -50,6 +79,9 @@ const TDDE_CONSTANTS = {
   VERY: 1.725,
   EXTREMELY: 1.9,
 };
+
+const cardStyle =
+  "flex items-center flex-col p-2 border border-gray-200 rounded-lg cursor-pointer items-center w-80 h-48";
 
 interface StepOneProps {
   onDataChange: (data: {
@@ -66,148 +98,213 @@ interface StepOneProps {
 const POLLING_FREQUENCY_MS = 1000;
 
 function StepOne({ onDataChange }: StepOneProps) {
-  const [age, setAge] = useState<number | null>(null);
-  const [weight, setWeight] = useState<number | null>(null);
-  const [height, setHeight] = useState<number | null>(null);
-  const [selectedGender, setSelectedGender] = useState<GendersTypes | null>(
-    null
-  );
-  const [selectedActivity, setSelectedActivity] = useState<Activities | null>(
-    null
-  );
-
-  const [isError, setIsError] = useState<boolean>(true);
+  //states
   const [bmr, setBMR] = useState<number | null>(null);
   const [tdee, setTDEE] = useState<number | null>(null);
 
-  const [data, setData] = useState({
-    age: age,
-    weight: weight,
-    height: height,
-    bmr: bmr,
-    tdee: tdee,
-    selectedGender: selectedGender,
-    selectedActivity: selectedActivity,
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      gender: "",
+      age: 0,
+      metrics: {
+        weight: 0,
+        height: 0,
+      },
+      activity: "",
+    },
   });
 
-  const handleSelectGender = useCallback(async (genderId: GendersTypes) => {
-    setSelectedGender(genderId);
-  }, []);
+  const { watch, setValue } = form;
 
-  const handleSelectActivity = useCallback(async (activityId: Activities) => {
-    setSelectedActivity(activityId);
-  }, []);
+  const watchAllFields = watch();
 
-  const handleAgeGender = (age: number) => {
-    setAge(age);
+  const handleSelectGender = (genderId: GendersTypes) => {
+    setValue("gender", genderId);
   };
 
-  const onErrorChange = useCallback(async () => {
-    if (age && weight && height && selectedActivity && selectedGender) {
-      setIsError((prev) => (prev = false));
+  const handleSelectActivity = (activityId: Activities) => {
+    setValue("activity", activityId);
+  };
+
+  const calculateBMR = (
+    gender: string,
+    weight: number,
+    height: number,
+    age: number
+  ) => {
+    if (gender === "FEMALE") {
+      return 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
+    } else {
+      return 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
     }
-  }, [age, height, selectedActivity, selectedGender, weight]);
+  };
 
-  const calculateBMR = useCallback(async () => {
-    if (!selectedGender || !weight || !height || !age) return;
-
-    const bmrValue =
-      selectedGender === "FEMALE"
-        ? 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age
-        : 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
-    setBMR(bmrValue);
-  }, [selectedGender, weight, height, age]);
-
-  const calculateTDEE = useCallback(async () => {
-    calculateBMR();
-    if (!selectedActivity || !bmr) return;
-    const tdeeValue = bmr * TDDE_CONSTANTS[selectedActivity];
-    setTDEE(tdeeValue);
-    onErrorChange();
-    onDataChange({
-      age,
-      weight,
-      height,
-      bmr,
-      tdee: tdeeValue,
-      selectedGender,
-      selectedActivity,
-      isError,
-    });
-  }, [
-    selectedActivity,
-    bmr,
-    onErrorChange,
-    onDataChange,
-    age,
-    weight,
-    height,
-    selectedGender,
-    isError,
-  ]);
+  const calculateTDEE = (bmr: number, activity: string) => {
+    return bmr * TDDE_CONSTANTS[activity as keyof typeof TDDE_CONSTANTS];
+  };
 
   useEffect(() => {
-    const timer = setInterval(calculateTDEE, POLLING_FREQUENCY_MS);
+    const { gender, metrics, age, activity } = watchAllFields;
+    if (gender && metrics.weight && metrics.height && age) {
+      const bmrValue = calculateBMR(
+        gender,
+        metrics.weight,
+        metrics.height,
+        age
+      );
+      setBMR(bmrValue);
 
-    return () => clearInterval(timer);
-  }, [calculateTDEE]);
+      if (activity) {
+        const tdeeValue = calculateTDEE(bmrValue, activity);
+        setTDEE(tdeeValue);
+      }
+    }
+    console.log({ bmr, tdee });
+  }, [watchAllFields]);
+
+  function onSubmit(values: FormSchema, e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    console.log(values);
+  }
 
   return (
-    <Card className="flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg gap-2 p-4">
-      <div className="w-60 md:w-[590px] grid grid-col-1 md:grid-cols-3 justify-between">
-        <div className="md:col-start-1 md:col-span-1 flex justify-between place-content-between flex-col items-center w-64 h-48">
-          <Card className={`${cardStyle} p-0 h-28 w-60`}>
-            <CardTitle className="my-2 text-base">Gender</CardTitle>
-            <CardContent className="flex items-center p-0 gap-2">
-              {genders.map((gender) => (
-                <GenderCard
-                  key={gender.id}
-                  gender={gender.gender}
-                  icon={gender.icon}
-                  selected={gender.id === selectedGender}
-                  onSelect={() => handleSelectGender(gender.id as GendersTypes)}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex items-center justify-center flex-col flex-grow p-4 gap-2"
+      >
+        <Card className="flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg gap-2 px-2 m-0">
+          <section className="w-60 mt-2 md:w-[590px] flex flex-col md:grid md:grid-cols-3 justify-between">
+            <div className="items-center w-60 h-48 flex flex-col md:col-start-1 md:col-span-1 place-content-between  ">
+              <Card className="flex items-center flex-col border border-gray-200 rounded-lg cursor-pointer p-0 h-28 w-60">
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }: any) => (
+                    <FormItem className="flex flex-col items-center justify-center my-2">
+                      <FormLabel className="text-base font-bold">
+                        Gender
+                      </FormLabel>
+                      <FormControl>
+                        <div className="flex items-center gap-2">
+                          {genders.map((gender) => (
+                            <GenderCard
+                              key={gender.id}
+                              gender={gender.gender}
+                              icon={gender.icon}
+                              selected={gender.id === field.value}
+                              onSelect={() => {
+                                field.onChange(gender.id);
+                                handleSelectGender(gender.id as GendersTypes);
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              ))}
-            </CardContent>
-          </Card>
+              </Card>
 
-          <Card className="flex items-center flex-col md:flex-row border justify-center md:gap-4 border-gray-200 rounded-lg cursor-pointer mt-2 p-0 h-28 md:h-24 w-60">
-            <CardTitle className="my-2 text-base">Age</CardTitle>
-            <CardContent className=" flex flex-col gap-1 items-center p-0">
-              <Input
-                className="w-14 h-8 mb-2 md:mb-0 p-2"
-                type="text"
-                placeholder="age"
-                onChange={(e) => handleAgeGender(parseFloat(e.target.value))}
+              <Card className="flex items-center justify-center flex-col md:flex-row border  md:gap-4 border-gray-200 rounded-lg cursor-pointer mt-2 p-0 h-28 md:h-24 w-60">
+                <FormField
+                  control={form.control}
+                  name="age"
+                  render={({ field }: any) => (
+                    <FormItem className="flex flex-col items-center justify-center">
+                      <div className="flex gap-1 items-center justify-center">
+                        <FormLabel className="text-base font-bold">
+                          Age
+                        </FormLabel>
+                        <FormControl className="">
+                          <Input
+                            type="number"
+                            className="w-14 h-8 p-2"
+                            placeholder="age"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </Card>
+            </div>
+
+            {/* Metrics */}
+            <Card className="w-60 p-2 mt-2 md:mt-0 md:mr-1 flex items-center justify-center flex-col flex-grow md:w-80 md:h-48 mx-auto  md:col-end-4 md:col-span-2  border border-gray-200 rounded-lg cursor-pointer ">
+              <FormField
+                control={form.control}
+                name="metrics"
+                render={({ field }: any) => (
+                  <FormItem>
+                    {/* <FormLabel>Age</FormLabel> */}
+                    <FormControl>
+                      <Metrics
+                        onHeightChange={(value) =>
+                          setValue("metrics.height", Number(value))
+                        }
+                        onWeightChange={(value) =>
+                          setValue("metrics.weight", Number(value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </CardContent>
+            </Card>
+          </section>
+
+          {/* Activities */}
+          <Card className=" w-60 h-auto mb-2 md:w-[590px] flex flex-col items-center justify-center border border-gray-200 rounded-lg cursor-pointer ">
+            <section className="w-60 md:w-[590px] grid grid-col-1 justify-between">
+              <FormField
+                control={form.control}
+                name="activity"
+                render={({ field }: any) => (
+                  <FormItem className="w-60 md:w-[590px] flex flex-wrap flex-col items-center justify-center mb-1">
+                    <FormLabel className="mt-2 text-base font-bold">
+                      How Active Are You?
+                    </FormLabel>
+                    <FormControl className="grid grid-col-1 md:grid-cols-2 gap-1 m-1 p-1">
+                      <div className="">
+                        {activities.map((activity) => (
+                          <ActivityCard
+                            key={activity.id}
+                            title={activity.title}
+                            description={activity.description}
+                            image={activity.image}
+                            selected={activity.id === field.value}
+                            onSelect={() => {
+                              field.onChange(activity.id);
+                              handleSelectActivity(activity.id as Activities);
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </section>
           </Card>
-        </div>
-
-        <Card className="mt-2 md:mt-0 md:mr-4 md:col-end-4 md:col-span-2 flex items-center justify-center flex-col flex-grow border border-gray-200 rounded-lg cursor-pointer w-60 md:w-80 md:h-48 mx-auto">
-          <CardContent className="p-2 md:p-0 items-center justify-center">
-            <Metrics onWeightChange={setWeight} onHeightChange={setHeight} />
-          </CardContent>
         </Card>
-      </div>
 
-      {/* Activities */}
-      <Card className="flex flex-col border justify-center  border-gray-200 rounded-lg cursor-pointer items-center h-auto w-60 md:w-[590px] mb-4">
-        <CardTitle className="mb-2 text-base">How Active Are You?</CardTitle>
-        <CardContent className="grid grid-col-1 md:grid-cols-2 gap-2">
-          {activities.map((activity) => (
-            <ActivityCard
-              key={activity.id}
-              title={activity.title}
-              description={activity.description}
-              image={activity.image}
-              selected={activity.id === selectedActivity}
-              onSelect={() => handleSelectActivity(activity.id as Activities)}
-            />
-          ))}
-        </CardContent>
-      </Card>
-    </Card>
+        <Button className="bg-gray-500 rounded-lg m-0 " type="submit">
+          Submit
+        </Button>
+      </form>
+    </Form>
   );
 }
 
