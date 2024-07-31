@@ -114,7 +114,7 @@ function ChatPage() {
           success: boolean;
           error?: string;
           run?: Run;
-        }>("api/run/retrieve", {
+        }>("/api/run/retrieve", {
           threadId,
           runId,
         });

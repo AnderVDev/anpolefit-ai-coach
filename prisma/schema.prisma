@@ -41,3 +41,24 @@ model UserMeta {
   p256dh    String   @db.String(255)
   auth      String   @db.String(255)
 }
+
+model UserMacrosProfiles {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @unique
+  activity     String   @db.String(255)
+  age          Int
+  bodyType     String @db.String(255)
+  expectation  String @db.String(255)
+  gender       String @db.String(255)
+  height       Int
+  weight       Int
+  tdci         Int
+  proteinKcal  Int
+  proteinGrams Int
+  carbKcal     Int
+  carbGrams    Int
+  fatKcal      Int
+  fatGrams     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

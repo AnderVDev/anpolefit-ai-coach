@@ -54,38 +54,27 @@ function StepTwo({
   onStepSuccess,
   onStepBack,
 }: StepTwoProps) {
+  const [selectedExpectation, setSelectedExpectation] =
+    useState<Expectations | null>(null);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       expectation: null,
     },
   });
-  const { watch, setValue, handleSubmit, control } = form;
+  const { watch, handleSubmit, control } = form;
 
   const watchAllFields = watch();
-
-  const [selectedExpectation, setSelectedExpectation] =
-    useState<Expectations | null>(null);
 
   const handleSelectExpectation = (expectationId: Expectations) => {
     setSelectedExpectation(expectationId);
   };
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     onExpectationChange(selectedExpectation);
-  //   }, POLLING_FREQUENCY_MS);
-  //   // onExpectationChange(selectedExpectation);
-  //   return () => clearTimeout(timer);
-  // }, [selectedExpectation]);
-
   const onSubmit: SubmitHandler<FormSchema> = () => {
     const { expectation } = watchAllFields;
+    handleSelectExpectation(expectation);
     onExpectationChange(expectation);
-
     onStepSubmitSuccess(true);
-    // onStepSuccess(2);
-    // console.log("Form values", values);
   };
 
   return (
@@ -126,7 +115,7 @@ function StepTwo({
           )}
         />
         <section className="flex gap-2">
-          <Button className="bg-gray-200 rounded-lg m-0 " onClick={onStepBack}>
+          <Button className="bg-purple-400 hover:bg-gray-500 rounded-lg m-0 " onClick={onStepBack}>
             Back
           </Button>
           <Button className="bg-gray-500 rounded-lg m-0 " type="submit">

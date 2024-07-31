@@ -102,7 +102,14 @@ function StepContent({
           onStepBack={handleStepBack}
         />
       )}
-      {step === 4 && <StepFour inputs={inputs} />}
+      {step === 4 && (
+        <StepFour
+          inputs={inputs}
+          onStepSubmitSuccess={handleStepSubmitSuccess}
+          onStepSuccess={HandleCurrentStep}
+          onStepBack={handleStepBack}
+        />
+      )}
     </div>
   );
 }

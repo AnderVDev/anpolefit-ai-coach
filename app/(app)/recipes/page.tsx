@@ -27,7 +27,7 @@ function Recipes() {
   const URL = `${API_URL}?app_id=${APP_ID}&app_key=${APP_KEY}&q=${query}&type=public`;
 
   const fetchRecipes = useCallback(async () => {
-    if (!userThread) return;
+    if (!userThread?.id) return;
 
     setFetching(true);
 

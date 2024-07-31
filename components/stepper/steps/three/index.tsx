@@ -127,7 +127,7 @@ function StepThree({
           )}
         />
         <section className="flex gap-2">
-          <Button className="bg-gray-200 rounded-lg m-0 " onClick={onStepBack}>
+          <Button className="bg-purple-400 hover:bg-gray-500 rounded-lg m-0 " onClick={onStepBack}>
             Back
           </Button>
           <Button className="bg-gray-500 rounded-lg m-0 " type="submit">

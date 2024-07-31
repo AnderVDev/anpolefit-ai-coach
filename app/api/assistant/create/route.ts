@@ -35,7 +35,7 @@ export async function POST() {
       `,
     });
 
-    console.log(assistant);
+    // console.log(assistant);
 
     return NextResponse.json({ assistant }, { status: 201 });
   } catch (error) {
