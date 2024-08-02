@@ -26,9 +26,9 @@ const Stepper = () => {
     }
   };
 
-
   const handleBackStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    setComplete(false);
   };
 
   return (

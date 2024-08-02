@@ -37,20 +37,18 @@ function StepContent({
     gender: null,
     activity: null,
   });
-  // console.log("stepOneData in Content", stepOneData);
 
   const inputs = {
     ...stepOneData,
     expectation,
     bodyType,
   };
-  console.log("inputs in Content", inputs);
+
 
   const handleStepOneDataChange = useCallback((data: StepOneData) => {
     setStepOneData(data);
   }, []);
 
-  // console.log({ stepOneData });
   const handleStepTwoDataChange = useCallback(
     (expectation: "BUILD" | "RECOMPOSITION" | null) => {
       setExpectation(expectation);

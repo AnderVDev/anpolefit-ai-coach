@@ -23,8 +23,6 @@ export async function POST(request: Request) {
     fatGrams,
   } = body;
 
-  console.log("user", user);
-  // console.log("body", body);
   if (
     !user ||
     !activity ||

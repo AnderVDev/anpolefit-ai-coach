@@ -13,7 +13,6 @@ export async function POST(request: Request) {
   const response = await request.json();
   const { id, sendNotifications, challengeId } = response;
   
-//   console.log(response);
 
   if (!id || sendNotifications === undefined || !challengeId) {
     return NextResponse.json(
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
       data: updatedChallengePreferences,
     });
   } catch (error) {
-    console.error(error);
+    
     return NextResponse.json(
       { success: false, message: "Something went wrong" },
       { status: 500 }
