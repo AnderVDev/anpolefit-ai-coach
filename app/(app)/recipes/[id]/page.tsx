@@ -136,8 +136,6 @@ function RecipeDetails() {
             </div>
           </section>
 
-
-          
           {/* BOTTOM SIDE */}
           <section className="flex flex-col items-center justify-center gap-3 md:w-[640px]">
             <p className="text-2xl underline">Health Labels</p>

@@ -8,6 +8,20 @@ import { LoaderCircleIcon } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import FilterSelector from "./components/FilterSelector";
 import { FancyMultiSelect } from "./components/FancyMultiSelect";
+import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 type Option = { value: string; label: string };
 const dietOptions: Option[] = [
@@ -55,6 +69,7 @@ const healthOptions: Option[] = [
   { value: "vegetarian", label: "Vegetarian" },
   { value: "wheat-free", label: "Wheat-free" },
 ];
+
 const cuisineTypeOptions: string[] = [
   "American",
   "Asian",
@@ -88,6 +103,21 @@ const API_URL = process.env.NEXT_PUBLIC_BASE_URL_EDAMAM;
 const APP_ID = process.env.NEXT_PUBLIC_APP_ID_EDAMAM;
 const APP_KEY = process.env.NEXT_PUBLIC_APP_KEY_EDAMAM;
 
+const formSchema = z.object({
+  query: z.string().min(1, "Query is required"),
+  diet: z.array(z.string()).optional(),
+  health: z.array(z.string()).optional(),
+  cuisineType: z.string().optional(),
+  mealType: z.string().optional(),
+  calories: z.number().optional(),
+  time: z.number().optional(),
+  fat: z.number().optional(),
+  chocdf: z.number().optional(),
+  sugar: z.number().optional(),
+});
+
+type FormSchema = z.infer<typeof formSchema>;
+
 interface RecipesProps {
   recipe: any;
 }
@@ -99,95 +129,285 @@ function Recipes() {
   // State
   const [recipes, setRecipes] = useState([]);
   const [fetching, setFetching] = useState(false);
-  const [query, setQuery] = useState("Chicken");
+  // const [query, setQuery] = useState("Chicken");
 
-  const [diet, setDiet] = useState(""); //list
-  const [health, setHealth] = useState(""); //list
-  const [cuisineType, setCuisineType] = useState(""); //list
-  const [mealType, setMealType] = useState(""); //list
-  const [calories, setCalories] = useState(""); //range
-  const [time, setTime] = useState(""); //range
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      query: "Chicken",
+      diet: [""],
+      health: [""],
+      cuisineType: "",
+      mealType: "",
+      calories: undefined,
+      time: undefined,
+      fat: undefined,
+      chocdf: undefined,
+      sugar: undefined,
+    },
+  });
 
-  const URL = `${API_URL}?app_id=${APP_ID}&app_key=${APP_KEY}&q=${query}&type=public`;
+  const { watch, setValue, handleSubmit, control } = form;
 
-  const fetchRecipes = useCallback(async () => {
-    if (!userThread?.id) return;
+  const watchAllFields = watch();
 
-    setFetching(true);
+  // const URL = `${API_URL}?app_id=${APP_ID}&app_key=${APP_KEY}&q=${query}&type=public`;
 
-    try {
-      const { data } = await axios.get(URL);
-      const { hits, error } = data;
+  const fetchRecipes = useCallback(
+    async (data: FormSchema) => {
+      if (!userThread?.id) return;
 
-      // Validation
-      if (!data || error) {
-        console.error(error ?? "Unknown error.");
+      setFetching(true);
+
+      const params = {
+        app_id: APP_ID,
+        app_key: APP_KEY,
+        q: data.query,
+        type: "public",
+        diet: data.diet.join(","),
+        health: data.health.join(","),
+        cuisineType: data.cuisineType,
+        mealType: data.mealType,
+        calories: data.calories ? `0-${data.calories}` : undefined,
+        time: data.time ? `0-${data.time}` : undefined,
+        fat: data.fat ? `0-${data.fat}` : undefined,
+        chocdf: data.chocdf ? `0-${data.chocdf}` : undefined,
+        SUGAR: data.sugar ? `0-${data.sugar}` : undefined,
+      };
+
+      const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, v]) => v !== undefined)
+      );
+      const searchParams = new URLSearchParams(filteredParams).toString();
+      const URL = `${API_URL}?${searchParams}`;
+
+      try {
+        const { data } = await axios.get(URL);
+        const { hits, error } = data;
+
+        if (!data || error) {
+          console.error(error ?? "Unknown error.");
+          setRecipes([]);
+          return;
+        }
+
+        setRecipes(hits.map((hit: any) => hit.recipe));
+      } catch (error) {
+        console.error(error);
         setRecipes([]);
-        return;
+      } finally {
+        setFetching(false);
       }
-
-      setRecipes(hits.map((hit: any) => hit.recipe));
-      // setRecipes(hits);
-      // console.log(recipes);
-    } catch (error) {
-      console.error(error);
-      setRecipes([]);
-    } finally {
-      setFetching(false);
-    }
-    // console.log({ recipes });
-  }, [userThread?.id, URL]);
-
-  useEffect(() => {
-    if (query) {
-      const timer = setTimeout(() => {
-        // fetchRecipes();
-      }, POLLING_FREQUENCY_MS);
-
-      return () => clearTimeout(timer);
-    }
-  }, [query, fetchRecipes]);
-
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setQuery(e.target.value);
     },
-    []
+    [userThread?.id]
   );
 
-  const handleSearchedRecipe = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      fetchRecipes();
-    },
-    [fetchRecipes]
-  );
+  const onSubmit: SubmitHandler<FormSchema> = (data) => {
+    console.log("data", data);
+    // fetchRecipes(data);
+  };
+
+  // const handleSearchedRecipe = useCallback(
+  //   (e: React.FormEvent<HTMLFormElement>) => {
+  //     e.preventDefault();
+  //     fetchRecipes();
+  //   },
+  //   [fetchRecipes]
+  // );
+
   return (
     <>
-      <section className=" flex flex-col items-center justify-center md:flex-row gap-2  p-2 md:px-2">
+      <section className="flex flex-col items-center justify-center md:flex-row gap-2 p-2 md:px-2">
         {/* LEFT SIDE */}
-        <section className="md:w-1/4 ">
-          <form
-            className="flex gap-2 md:flex-col w-full lg:w-1/4"
-            onSubmit={handleSearchedRecipe}
-          >
-            <Input
-              className="rounded-full"
-              placeholder="eg. Pancake, Cake, Vegan, Chicken"
-              onChange={handleInputChange}
-              inputMode="text"
-            />
-            <FancyMultiSelect title="Diet Options" options={dietOptions} />
-            <FancyMultiSelect title="health" options={healthOptions} />
+        <section className="md:w-1/4">
+          <Card className="p-2">
+            <Form {...form}>
+              <form
+                className="flex md:flex-col gap-2"
+                onSubmit={handleSubmit(onSubmit)}
+              >
+                <FormField
+                  name="query"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      <FormLabel>Query</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="rounded-full"
+                          placeholder="eg. Pancake, Cake, Vegan, Chicken"
+                          inputMode="text"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FilterSelector title="cuisineType" values={cuisineTypeOptions} />
-            <FilterSelector title="mealType" values={mealTypeOptions} />
-          </form>
+                <FancyMultiSelect
+                  title="Diet Options"
+                  options={dietOptions}
+                  onChange={(selected) =>
+                    setValue(
+                      "diet",
+                      selected.map((opt) => opt.value)
+                    )
+                  }
+                />
+                <FancyMultiSelect
+                  title="Health Options"
+                  options={healthOptions}
+                  onChange={(selected) =>
+                    setValue(
+                      "health",
+                      selected.map((opt) => opt.value)
+                    )
+                  }
+                />
+
+                <FilterSelector
+                  title="Cuisine Type"
+                  options={cuisineTypeOptions}
+                  onChange={(value: string | undefined) =>
+                    setValue("cuisineType", value)
+                  }
+                />
+                <FilterSelector
+                  title="Meal Type"
+                  options={mealTypeOptions}
+                  onChange={(value: string | undefined) =>
+                    setValue("mealType", value)
+                  }
+                />
+
+                <FormField
+                  name="calories"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      <FormLabel>
+                        Calories <span>{field.value ?? 0} kcal</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          value={[field.value ?? 0]}
+                          onValueChange={(v) => field.onChange(v[0])}
+                          defaultValue={[field.value as number]}
+                          max={5000}
+                          step={10}
+                          className="max-w-[40%] md:max-w-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="time"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      <FormLabel>
+                        Time <span>{field.value ?? 0} min</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          value={[field.value ?? 0]}
+                          onValueChange={(v) => field.onChange(v[0])}
+                          defaultValue={[field.value as number]}
+                          max={360}
+                          step={1}
+                          className="max-w-[40%] md:max-w-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="fat"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Fat <span>{field.value ?? 0} g</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          value={[field.value ?? 0]}
+                          onValueChange={(v) => field.onChange(v[0])}
+                          defaultValue={[field.value as number]}
+                          max={100}
+                          step={1}
+                          className="max-w-[40%] md:max-w-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="chocdf"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Carbohydrates <span>{field.value ?? 0} g</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          value={[field.value ?? 0]}
+                          onValueChange={(v) => field.onChange(v[0])}
+                          defaultValue={[field.value as number]}
+                          max={500}
+                          step={1}
+                          className="max-w-[40%] md:max-w-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="sugar"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Sugar <span>{field.value ?? 0}</span> g
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          value={[field.value ?? 0]}
+                          onValueChange={(v) => field.onChange(v[0])}
+                          defaultValue={[field.value as number]}
+                          max={100}
+                          step={1}
+                          className="max-w-[40%] md:max-w-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button className="w-full mt-2" type="submit">
+                  Search
+                </Button>
+              </form>
+            </Form>
+          </Card>
         </section>
+
         {/* RIGHT SIDE */}
         {fetching ? (
           <section className="md:w-3/4 2xl:pl-10 mt-20 md:mt-0">
-            <p className=" flex gap-2 text-center">
+            <p className="flex gap-2 text-center">
               <LoaderCircleIcon className="animate-spin" /> Loading Recipes...
             </p>
           </section>
@@ -199,7 +419,7 @@ function Recipes() {
           </section>
         ) : (
           <section className="md:w-3/4 2xl:pl-10 mt-20 md:mt-0">
-            <p className="flex gap-2  text-center">No Recipes Found</p>
+            <p className="flex gap-2 text-center">No Recipes Found</p>
           </section>
         )}
       </section>

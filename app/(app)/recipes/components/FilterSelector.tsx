@@ -9,25 +9,24 @@ import {
 
 interface FilterSelectorProp {
   title: string;
-  values: string[];
+  options: string[];
+  onChange: (value: string | undefined) => void;
 }
 
-function FilterSelector({ title, values }: FilterSelectorProp) {
+function FilterSelector({ title, options, onChange }: FilterSelectorProp) {
   return (
-    <>
-      <Select>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={title} />
-        </SelectTrigger>
-        <SelectContent>
-          {values.map((value) => (
-            <SelectItem key={value} value={value}>
-              {value.charAt(0).toUpperCase() + value.slice(1)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </>
+    <Select onValueChange={onChange}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder={title} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((option) => (
+          <SelectItem key={option} value={option}>
+            {option.charAt(0).toUpperCase() + option.slice(1)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 

@@ -15,9 +15,10 @@ type Option = { value: string; label: string };
 interface FancyMultiSelectProps {
   title: string;
   options: Option[];
+  onSelectionChange: (selected: Option[]) => void;
 }
 
-export function FancyMultiSelect({ title, options }: FancyMultiSelectProps) {
+export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMultiSelectProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<Option[]>([]);
@@ -55,7 +56,10 @@ export function FancyMultiSelect({ title, options }: FancyMultiSelectProps) {
   );
 
   return (
-    <Command onKeyDown={handleKeyDown} className="overflow-visible bg-transparent">
+    <Command
+      onKeyDown={handleKeyDown}
+      className="overflow-visible bg-transparent"
+    >
       <div className="group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
         <div className="flex flex-wrap gap-1">
           {selected.map((option) => {

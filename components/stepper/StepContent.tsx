@@ -44,7 +44,6 @@ function StepContent({
     bodyType,
   };
 
-
   const handleStepOneDataChange = useCallback((data: StepOneData) => {
     setStepOneData(data);
   }, []);
