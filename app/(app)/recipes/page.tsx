@@ -110,6 +110,7 @@ const formSchema = z.object({
   cuisineType: z.string().optional(),
   mealType: z.string().optional(),
   calories: z.number().optional(),
+  procnt: z.number().optional(),
   time: z.number().optional(),
   fat: z.number().optional(),
   chocdf: z.number().optional(),
@@ -134,16 +135,17 @@ function Recipes() {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      query: "Chicken",
+      query: "",
       diet: [""],
       health: [""],
-      cuisineType: "",
-      mealType: "",
-      calories: undefined,
-      time: undefined,
-      fat: undefined,
-      chocdf: undefined,
-      sugar: undefined,
+      cuisineType: undefined,
+      mealType: undefined,
+      time: 0,
+      calories: 0,
+      procnt: 0,
+      fat: 0,
+      chocdf: 0,
+      sugar: 0,
     },
   });
 
@@ -160,26 +162,86 @@ function Recipes() {
       setFetching(true);
 
       const params = {
+        type: "public",
         app_id: APP_ID,
         app_key: APP_KEY,
         q: data.query,
-        type: "public",
-        diet: data.diet.join(","),
-        health: data.health.join(","),
-        cuisineType: data.cuisineType,
-        mealType: data.mealType,
-        calories: data.calories ? `0-${data.calories}` : undefined,
-        time: data.time ? `0-${data.time}` : undefined,
-        fat: data.fat ? `0-${data.fat}` : undefined,
-        chocdf: data.chocdf ? `0-${data.chocdf}` : undefined,
-        SUGAR: data.sugar ? `0-${data.sugar}` : undefined,
+        diet:
+          data.diet.length > 0 && data.diet[0] !== "" ? data.diet : undefined,
+        health:
+          data.health.length > 0 && data.health[0] !== ""
+            ? data.health
+            : undefined,
+        cuisineType: data.cuisineType ? data.cuisineType : undefined,
+        mealType: data.mealType ? data.mealType : undefined,
       };
 
-      const filteredParams = Object.fromEntries(
-        Object.entries(params).filter(([_, v]) => v !== undefined)
-      );
-      const searchParams = new URLSearchParams(filteredParams).toString();
-      const URL = `${API_URL}?${searchParams}`;
+      const nutrients = {
+        ENERC_KCAL: data?.calories > 0 ? `${data.calories}` : undefined,
+        // ENERC_KCAL: data.calories > 0 ? `0-${data.calories}` : undefined,
+        PROCNT: data?.procnt > 0 ? `${data.procnt}` : undefined,
+        FAT: data.fat > 0 ? `${data.fat}` : undefined,
+        CHOCDF: data.chocdf > 0 ? `${data.chocdf}` : undefined,
+        SUGAR: data.sugar > 0 ? `${data.sugar}` : undefined,
+      };
+
+      const searchParams = new URLSearchParams();
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          if (Array.isArray(value)) {
+            value.forEach((val) => searchParams.append(key, val));
+          } else {
+            searchParams.append(key, value);
+          }
+        }
+      });
+
+      Object.entries(nutrients).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(`nutrients[${key}]`, value);
+        }
+      });
+
+      const URL = `${API_URL}?${searchParams.toString()}`;
+      console.log("URL", URL);
+
+      // ____________________________
+
+      // const params = {
+      //   type: "public",
+      //   app_id: APP_ID,
+      //   app_key: APP_KEY,
+      //   q: data.query,
+      //   diet:
+      //     data.diet.length > 0 && data.diet[0] !== "" ? data.diet : undefined,
+      //   health:
+      //     data.health.length > 0 && data.health[0] !== ""
+      //       ? data.health
+      //       : undefined,
+      //   cuisineType: data.cuisineType ? data.cuisineType : undefined,
+      //   mealType: data.mealType ? data.mealType : undefined,
+      //   calories: data.calories > 0 ? `0-${data.calories}` : undefined,
+      //   time: data.time > 0 ? `0-${data.time}` : undefined,
+      //   fat: data.fat > 0 ? `0-${data.fat}` : undefined,
+      //   chocdf: data.chocdf > 0 ? `0-${data.chocdf}` : undefined,
+      //   SUGAR: data.sugar > 0 ? `0-${data.sugar}` : undefined,
+      // };
+
+      // const searchParams = new URLSearchParams();
+
+      // Object.entries(params).forEach(([key, value]) => {
+      //   if (value !== undefined) {
+      //     if (Array.isArray(value)) {
+      //       value.forEach((val) => searchParams.append(key, val));
+      //     } else {
+      //       searchParams.append(key, value);
+      //     }
+      //   }
+      // });
+
+      // const URL = `${API_URL}?${searchParams.toString()}`;
+      // console.log("URL", URL);
 
       try {
         const { data } = await axios.get(URL);
@@ -204,7 +266,7 @@ function Recipes() {
 
   const onSubmit: SubmitHandler<FormSchema> = (data) => {
     console.log("data", data);
-    // fetchRecipes(data);
+    fetchRecipes(data);
   };
 
   // const handleSearchedRecipe = useCallback(
@@ -223,7 +285,7 @@ function Recipes() {
           <Card className="p-2">
             <Form {...form}>
               <form
-                className="flex md:flex-col gap-2"
+                className="flex flex-col gap-2"
                 onSubmit={handleSubmit(onSubmit)}
               >
                 <FormField
@@ -248,20 +310,20 @@ function Recipes() {
                 <FancyMultiSelect
                   title="Diet Options"
                   options={dietOptions}
-                  onChange={(selected) =>
+                  onSelectionChange={(value) =>
                     setValue(
                       "diet",
-                      selected.map((opt) => opt.value)
+                      value.map((option) => option.value)
                     )
                   }
                 />
                 <FancyMultiSelect
                   title="Health Options"
                   options={healthOptions}
-                  onChange={(selected) =>
+                  onSelectionChange={(value) =>
                     setValue(
                       "health",
-                      selected.map((opt) => opt.value)
+                      value.map((option) => option.value)
                     )
                   }
                 />
@@ -279,6 +341,28 @@ function Recipes() {
                   onChange={(value: string | undefined) =>
                     setValue("mealType", value)
                   }
+                />
+                <FormField
+                  name="time"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      <FormLabel>
+                        Time <span>{field.value ?? 0} min</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Slider
+                          value={[field.value ?? 0]}
+                          onValueChange={(v) => field.onChange(v[0])}
+                          defaultValue={[field.value as number]}
+                          max={360}
+                          step={1}
+                          className="max-w-[40%] md:max-w-none"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
 
                 <FormField
@@ -303,22 +387,21 @@ function Recipes() {
                     </FormItem>
                   )}
                 />
-
                 <FormField
-                  name="time"
+                  name="procnt"
                   control={control}
                   render={({ field }: any) => (
                     <FormItem>
                       <FormLabel>
-                        Time <span>{field.value ?? 0} min</span>
+                        Protein <span>{field.value ?? 0} g</span>
                       </FormLabel>
                       <FormControl>
                         <Slider
                           value={[field.value ?? 0]}
                           onValueChange={(v) => field.onChange(v[0])}
                           defaultValue={[field.value as number]}
-                          max={360}
-                          step={1}
+                          max={5000}
+                          step={10}
                           className="max-w-[40%] md:max-w-none"
                         />
                       </FormControl>

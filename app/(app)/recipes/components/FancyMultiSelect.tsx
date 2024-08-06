@@ -1,6 +1,5 @@
 import * as React from "react";
 import { X } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import {
   Command,
@@ -9,6 +8,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Command as CommandPrimitive } from "cmdk";
+import { useCallback, useRef, useState } from "react";
 
 type Option = { value: string; label: string };
 
@@ -19,16 +19,20 @@ interface FancyMultiSelectProps {
 }
 
 export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMultiSelectProps) {
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = React.useState<Option[]>([]);
-  const [inputValue, setInputValue] = React.useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Option[]>([]);
+  const [inputValue, setInputValue] = useState("");
 
-  const handleUnselect = React.useCallback((option: Option) => {
-    setSelected((prev) => prev.filter((s) => s.value !== option.value));
-  }, []);
+  const handleUnselect = useCallback((option: Option) => {
+    setSelected((prev) => {
+      const newSelected = prev.filter((s) => s.value !== option.value);
+      onSelectionChange(newSelected);
+      return newSelected;
+    });
+  }, [onSelectionChange]);
 
-  const handleKeyDown = React.useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       const input = inputRef.current;
       if (input) {
@@ -37,6 +41,7 @@ export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMul
             setSelected((prev) => {
               const newSelected = [...prev];
               newSelected.pop();
+              onSelectionChange(newSelected);
               return newSelected;
             });
           }
@@ -46,7 +51,7 @@ export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMul
         }
       }
     },
-    []
+    [onSelectionChange]
   );
 
   const filteredOptions = options.filter(
@@ -64,7 +69,7 @@ export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMul
         <div className="flex flex-wrap gap-1">
           {selected.map((option) => {
             return (
-              <Badge key={option.value} variant="secondary">
+              <Badge key={option.value} variant="secondary" className="bg-white text-gray-500 ">
                 {option.label}
                 <button
                   className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -79,7 +84,7 @@ export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMul
                   }}
                   onClick={() => handleUnselect(option)}
                 >
-                  <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                  <X className="h-3 w-3 hover:text-foreground" />
                 </button>
               </Badge>
             );
@@ -90,8 +95,8 @@ export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMul
             onValueChange={setInputValue}
             onBlur={() => setOpen(false)}
             onFocus={() => setOpen(true)}
-            placeholder={`Select ${title.toLowerCase()}...`}
-            className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+            placeholder={selected.length > 0 ? "":`Select ${title.toLowerCase()}...`}
+            className="ml-2 flex-1 bg-transparent outline-none placeholder:text-gray-100"
             aria-expanded={open}
             aria-haspopup="listbox"
             aria-controls="option-list"
@@ -113,7 +118,11 @@ export function FancyMultiSelect({ title, options, onSelectionChange }: FancyMul
                       }}
                       onSelect={() => {
                         setInputValue("");
-                        setSelected((prev) => [...prev, option]);
+                        setSelected((prev) => {
+                          const newSelected = [...prev, option];
+                          onSelectionChange(newSelected);
+                          return newSelected;
+                        });
                       }}
                       className="cursor-pointer"
                       role="option"
