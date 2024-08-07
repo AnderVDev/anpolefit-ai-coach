@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import OptionsCard from "../../OptionsCard";
 import ectomorphBody from "@/app/assets/Ectomorph_body.jpg";
 import mesomorphBody from "@/app/assets/Mesomorph_body.jpg";
@@ -60,41 +60,40 @@ function StepThree({
   onStepSuccess,
   onStepBack,
 }: StepThreeProps) {
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      bodyType: null,
-    },
-  });
-  const { watch, setValue, handleSubmit, control } = form;
-
-  const watchAllFields = watch();
   const [selectedBodyType, setSelectedBodyType] = useState<BodiesTypes | null>(
     null
   );
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      bodyType: undefined,
+    },
+  });
+  const { watch, handleSubmit, control, setValue } = form;
+
+  const watchAllFields = watch();
 
   const handleSelectBodyType = (bodyTypeId: BodiesTypes) => {
     setSelectedBodyType(bodyTypeId);
+    setValue("bodyType", bodyTypeId);
   };
-
-  // useEffect(() => {
-  //   const bodyType = onBodyTypeChange(selectedBodyType);
-
-  //   // Clean up on unmount
-  //   // return () => clearInterval(bodyType);
-  // }, [selectedBodyType]);
 
   const onSubmit: SubmitHandler<FormSchema> = () => {
     const { bodyType } = watchAllFields;
     onBodyTypeChange(bodyType);
-
     onStepSubmitSuccess(true);
+    onStepSuccess(4); // or the next step number you want to proceed to
+  };
+
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSubmit(onSubmit)();
   };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleFormSubmit}
         className="flex items-center justify-center flex-col flex-grow p-4 gap-2"
       >
         <FormField
@@ -112,7 +111,7 @@ function StepThree({
                         name={type.name}
                         description={type.description}
                         image={type.image}
-                        selected={type.id === field.value}
+                        selected={type.id === selectedBodyType}
                         onSelect={() => {
                           field.onChange(type.id);
                           handleSelectBodyType(type.id as BodiesTypes);
@@ -127,7 +126,11 @@ function StepThree({
           )}
         />
         <section className="flex gap-2">
-          <Button className="bg-purple-400 hover:bg-gray-500 rounded-lg m-0 " onClick={onStepBack}>
+          <Button
+            className="bg-purple-400 hover:bg-gray-500 rounded-lg m-0 "
+            type="button"
+            onClick={onStepBack}
+          >
             Back
           </Button>
           <Button className="bg-gray-500 rounded-lg m-0 " type="submit">

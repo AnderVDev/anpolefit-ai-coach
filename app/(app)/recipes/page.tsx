@@ -206,60 +206,23 @@ function Recipes() {
       const URL = `${API_URL}?${searchParams.toString()}`;
       console.log("URL", URL);
 
-      // ____________________________
+      // try {
+      //   const { data } = await axios.get(URL);
+      //   const { hits, error } = data;
 
-      // const params = {
-      //   type: "public",
-      //   app_id: APP_ID,
-      //   app_key: APP_KEY,
-      //   q: data.query,
-      //   diet:
-      //     data.diet.length > 0 && data.diet[0] !== "" ? data.diet : undefined,
-      //   health:
-      //     data.health.length > 0 && data.health[0] !== ""
-      //       ? data.health
-      //       : undefined,
-      //   cuisineType: data.cuisineType ? data.cuisineType : undefined,
-      //   mealType: data.mealType ? data.mealType : undefined,
-      //   calories: data.calories > 0 ? `0-${data.calories}` : undefined,
-      //   time: data.time > 0 ? `0-${data.time}` : undefined,
-      //   fat: data.fat > 0 ? `0-${data.fat}` : undefined,
-      //   chocdf: data.chocdf > 0 ? `0-${data.chocdf}` : undefined,
-      //   SUGAR: data.sugar > 0 ? `0-${data.sugar}` : undefined,
-      // };
-
-      // const searchParams = new URLSearchParams();
-
-      // Object.entries(params).forEach(([key, value]) => {
-      //   if (value !== undefined) {
-      //     if (Array.isArray(value)) {
-      //       value.forEach((val) => searchParams.append(key, val));
-      //     } else {
-      //       searchParams.append(key, value);
-      //     }
+      //   if (!data || error) {
+      //     console.error(error ?? "Unknown error.");
+      //     setRecipes([]);
+      //     return;
       //   }
-      // });
 
-      // const URL = `${API_URL}?${searchParams.toString()}`;
-      // console.log("URL", URL);
-
-      try {
-        const { data } = await axios.get(URL);
-        const { hits, error } = data;
-
-        if (!data || error) {
-          console.error(error ?? "Unknown error.");
-          setRecipes([]);
-          return;
-        }
-
-        setRecipes(hits.map((hit: any) => hit.recipe));
-      } catch (error) {
-        console.error(error);
-        setRecipes([]);
-      } finally {
-        setFetching(false);
-      }
+      //   setRecipes(hits.map((hit: any) => hit.recipe));
+      // } catch (error) {
+      //   console.error(error);
+      //   setRecipes([]);
+      // } finally {
+      //   setFetching(false);
+      // }
     },
     [userThread?.id]
   );
@@ -269,13 +232,10 @@ function Recipes() {
     fetchRecipes(data);
   };
 
-  // const handleSearchedRecipe = useCallback(
-  //   (e: React.FormEvent<HTMLFormElement>) => {
-  //     e.preventDefault();
-  //     fetchRecipes();
-  //   },
-  //   [fetchRecipes]
-  // );
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSubmit(onSubmit)();
+  };
 
   return (
     <>
@@ -286,14 +246,15 @@ function Recipes() {
             <Form {...form}>
               <form
                 className="flex flex-col gap-2"
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleFormSubmit}
+                // onSubmit={handleSubmit(onSubmit)}
               >
                 <FormField
                   name="query"
                   control={control}
                   render={({ field }: any) => (
                     <FormItem>
-                      <FormLabel>Query</FormLabel>
+                      <FormLabel>Search</FormLabel>
                       <FormControl>
                         <Input
                           className="rounded-full"
@@ -307,7 +268,30 @@ function Recipes() {
                   )}
                 />
 
-                <FancyMultiSelect
+                <FormField
+                  name="diet"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      {/* <FormLabel></FormLabel> */}
+                      <FormControl>
+                        <FancyMultiSelect
+                          title="Diet Options"
+                          options={dietOptions}
+                          onSelectionChange={(value) =>
+                            setValue(
+                              "diet",
+                              value.map((option) => option.value)
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* <FancyMultiSelect
                   title="Diet Options"
                   options={dietOptions}
                   onSelectionChange={(value) =>
@@ -316,8 +300,28 @@ function Recipes() {
                       value.map((option) => option.value)
                     )
                   }
+                /> */}
+
+                <FormField
+                  name="health"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      {/* <FormLabel></FormLabel> */}
+                      <FormControl>
+                        <FancyMultiSelect
+                          title="Health Options"
+                          options={healthOptions}
+                          onSelectionChange={(value) =>
+                            field.onChange(value.map((option) => option.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FancyMultiSelect
+                {/* <FancyMultiSelect
                   title="Health Options"
                   options={healthOptions}
                   onSelectionChange={(value) =>
@@ -326,22 +330,62 @@ function Recipes() {
                       value.map((option) => option.value)
                     )
                   }
+                /> */}
+
+                <FormField
+                  name="cuisineType"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      {/* <FormLabel></FormLabel> */}
+                      <FormControl>
+                        <FilterSelector
+                          title="Cuisine Type"
+                          options={cuisineTypeOptions}
+                          onChange={(value: string | undefined) => {
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
 
-                <FilterSelector
+                {/* <FilterSelector
                   title="Cuisine Type"
                   options={cuisineTypeOptions}
                   onChange={(value: string | undefined) =>
                     setValue("cuisineType", value)
                   }
+                /> */}
+
+                <FormField
+                  name="mealType"
+                  control={control}
+                  render={({ field }: any) => (
+                    <FormItem>
+                      {/* <FormLabel></FormLabel> */}
+                      <FormControl>
+                        <FilterSelector
+                          title="Meal Type"
+                          options={mealTypeOptions}
+                          onChange={(value: string | undefined) => {
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FilterSelector
+                {/* <FilterSelector
                   title="Meal Type"
                   options={mealTypeOptions}
                   onChange={(value: string | undefined) =>
                     setValue("mealType", value)
                   }
-                />
+                /> */}
                 <FormField
                   name="time"
                   control={control}

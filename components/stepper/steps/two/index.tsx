@@ -42,7 +42,7 @@ const expectations = [
 ];
 
 interface StepTwoProps {
-  onExpectationChange: (expectation: Expectations | null) => void;
+  onExpectationChange: (expectation: Expectations) => void;
   onStepSubmitSuccess: (isCompleted: boolean) => void;
   onStepSuccess: (nextStep: number) => void;
   onStepBack: () => void;
@@ -59,15 +59,16 @@ function StepTwo({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      expectation: null,
+      expectation: undefined,
     },
   });
-  const { watch, handleSubmit, control } = form;
+  const { watch, handleSubmit, control, setValue } = form;
 
   const watchAllFields = watch();
 
   const handleSelectExpectation = (expectationId: Expectations) => {
     setSelectedExpectation(expectationId);
+    setValue("expectation", expectationId);
   };
 
   const onSubmit: SubmitHandler<FormSchema> = () => {
@@ -77,10 +78,16 @@ function StepTwo({
     onStepSubmitSuccess(true);
   };
 
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSubmit(onSubmit)();
+  };
+
   return (
     <Form {...form}>
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleFormSubmit}
+        // onSubmit={handleSubmit(onSubmit)}
         className="flex items-center justify-center flex-col flex-grow p-4 gap-2"
       >
         <FormField
@@ -98,7 +105,7 @@ function StepTwo({
                         name={expectation.name}
                         description={expectation.description}
                         image={expectation.image}
-                        selected={expectation.id === field.value}
+                        selected={expectation.id === selectedExpectation}
                         onSelect={() => {
                           field.onChange(expectation.id);
                           handleSelectExpectation(
@@ -115,7 +122,11 @@ function StepTwo({
           )}
         />
         <section className="flex gap-2">
-          <Button className="bg-purple-400 hover:bg-gray-500 rounded-lg m-0 " onClick={onStepBack}>
+          <Button
+            className="bg-purple-400 hover:bg-gray-500 rounded-lg m-0 "
+            type="button"
+            onClick={onStepBack}
+          >
             Back
           </Button>
           <Button className="bg-gray-500 rounded-lg m-0 " type="submit">
