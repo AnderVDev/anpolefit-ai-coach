@@ -206,23 +206,23 @@ function Recipes() {
       const URL = `${API_URL}?${searchParams.toString()}`;
       console.log("URL", URL);
 
-      // try {
-      //   const { data } = await axios.get(URL);
-      //   const { hits, error } = data;
+      try {
+        const { data } = await axios.get(URL);
+        const { hits, error } = data;
 
-      //   if (!data || error) {
-      //     console.error(error ?? "Unknown error.");
-      //     setRecipes([]);
-      //     return;
-      //   }
+        if (!data || error) {
+          console.error(error ?? "Unknown error.");
+          setRecipes([]);
+          return;
+        }
 
-      //   setRecipes(hits.map((hit: any) => hit.recipe));
-      // } catch (error) {
-      //   console.error(error);
-      //   setRecipes([]);
-      // } finally {
-      //   setFetching(false);
-      // }
+        setRecipes(hits.map((hit: any) => hit.recipe));
+      } catch (error) {
+        console.error(error);
+        setRecipes([]);
+      } finally {
+        setFetching(false);
+      }
     },
     [userThread?.id]
   );
@@ -241,8 +241,8 @@ function Recipes() {
     <>
       <section className="flex flex-col items-center justify-center md:flex-row gap-2 p-2 md:px-2">
         {/* LEFT SIDE */}
-        <section className="md:w-1/4">
-          <Card className="p-2">
+        <section className="md:w-1/4 sticky top-2 self-start">
+          <Card className="p-2 border border-gray-200">
             <Form {...form}>
               <form
                 className="flex flex-col gap-2"
@@ -291,17 +291,6 @@ function Recipes() {
                   )}
                 />
 
-                {/* <FancyMultiSelect
-                  title="Diet Options"
-                  options={dietOptions}
-                  onSelectionChange={(value) =>
-                    setValue(
-                      "diet",
-                      value.map((option) => option.value)
-                    )
-                  }
-                /> */}
-
                 <FormField
                   name="health"
                   control={control}
@@ -321,16 +310,6 @@ function Recipes() {
                     </FormItem>
                   )}
                 />
-                {/* <FancyMultiSelect
-                  title="Health Options"
-                  options={healthOptions}
-                  onSelectionChange={(value) =>
-                    setValue(
-                      "health",
-                      value.map((option) => option.value)
-                    )
-                  }
-                /> */}
 
                 <FormField
                   name="cuisineType"
@@ -352,14 +331,6 @@ function Recipes() {
                   )}
                 />
 
-                {/* <FilterSelector
-                  title="Cuisine Type"
-                  options={cuisineTypeOptions}
-                  onChange={(value: string | undefined) =>
-                    setValue("cuisineType", value)
-                  }
-                /> */}
-
                 <FormField
                   name="mealType"
                   control={control}
@@ -379,13 +350,7 @@ function Recipes() {
                     </FormItem>
                   )}
                 />
-                {/* <FilterSelector
-                  title="Meal Type"
-                  options={mealTypeOptions}
-                  onChange={(value: string | undefined) =>
-                    setValue("mealType", value)
-                  }
-                /> */}
+
                 <FormField
                   name="time"
                   control={control}
@@ -431,6 +396,7 @@ function Recipes() {
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   name="procnt"
                   control={control}
@@ -523,9 +489,11 @@ function Recipes() {
                   )}
                 />
 
-                <Button className="w-full mt-2" type="submit">
-                  Search
-                </Button>
+                <section className="flex items-center justify-center">
+                  <Button className="bg-gray-500 mt-2" type="submit">
+                    Search
+                  </Button>
+                </section>
               </form>
             </Form>
           </Card>
@@ -539,7 +507,7 @@ function Recipes() {
             </p>
           </section>
         ) : recipes?.length > 0 ? (
-          <section className="flex flex-col gap-2 items-center justify-center flex-grow md:w-3/4 2xl:pl-10 mt-20 md:mt-0">
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-center justify-center flex-grow md:w-3/4 2xl:pl-10 mt-20 md:mt-0">
             {recipes?.map((recipe, index) => (
               <RecipeCard recipe={recipe} key={index} />
             ))}
