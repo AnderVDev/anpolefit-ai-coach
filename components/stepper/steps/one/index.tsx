@@ -92,13 +92,13 @@ function StepOne({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      gender: null,
+      gender: undefined,
       age: 0,
       metrics: {
-        weight: null,
-        height: null,
+        weight: undefined,
+        height: undefined,
       },
-      activity: null,
+      activity: undefined,
     },
   });
   const { watch, setValue, handleSubmit, control } = form;

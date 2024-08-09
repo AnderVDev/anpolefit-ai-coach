@@ -242,255 +242,253 @@ function Recipes() {
       <section className="flex flex-col items-center justify-center md:flex-row gap-2 p-2 md:px-2">
         {/* LEFT SIDE */}
         <section className="md:w-1/4 sticky top-2 self-start">
-          <Card className="p-2 border border-gray-200">
+          <Card className="p-4 border border-gray-200 w-[405px]">
             <Form {...form}>
-              <form
-                className="flex flex-col gap-2"
-                onSubmit={handleFormSubmit}
-                // onSubmit={handleSubmit(onSubmit)}
-              >
-                <FormField
-                  name="query"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      <FormLabel>Search</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="rounded-full"
-                          placeholder="eg. Pancake, Cake, Vegan, Chicken"
-                          inputMode="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <form className="flex flex-col gap-4" onSubmit={handleFormSubmit}>
+                {/* Search Input */}
+                <div>
+                  <FormLabel className="font-bold text-lg">Search</FormLabel>
+                  <FormField
+                    name="query"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            className="rounded-md border-gray-300 text-"
+                            placeholder="e.g., Pancake, Cake, Vegan, Chicken"
+                            inputMode="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                <FormField
-                  name="diet"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      {/* <FormLabel></FormLabel> */}
-                      <FormControl>
-                        <FancyMultiSelect
-                          title="Diet Options"
-                          options={dietOptions}
-                          onSelectionChange={(value) =>
-                            setValue(
-                              "diet",
-                              value.map((option) => option.value)
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Diet Options */}
+                <div className="space-y-2">
+                  <FormLabel className="font-bold text-lg">
+                    Dietary Options
+                  </FormLabel>
+                  <FormField
+                    name="diet"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <FancyMultiSelect
+                            title="Diet Options"
+                            options={dietOptions}
+                            onSelectionChange={(value) =>
+                              setValue(
+                                "diet",
+                                value.map((option) => option.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  name="health"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      {/* <FormLabel></FormLabel> */}
-                      <FormControl>
-                        <FancyMultiSelect
-                          title="Health Options"
-                          options={healthOptions}
-                          onSelectionChange={(value) =>
-                            field.onChange(value.map((option) => option.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  {/* Health Options */}
+                  <FormField
+                    name="health"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <FancyMultiSelect
+                            title="Health Options"
+                            options={healthOptions}
+                            onSelectionChange={(value) =>
+                              field.onChange(
+                                value.map((option) => option.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                <FormField
-                  name="cuisineType"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      {/* <FormLabel></FormLabel> */}
-                      <FormControl>
-                        <FilterSelector
-                          title="Cuisine Type"
-                          options={cuisineTypeOptions}
-                          onChange={(value: string | undefined) => {
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Cuisine and Meal Type */}
+                <div className="space-y-4">
+                  <FormLabel className="font-bold text-lg">Filters</FormLabel>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <FormField
+                      name="cuisineType"
+                      control={control}
+                      render={({ field }) => (
+                        <FormItem className="w-full md:w-1/2">
+                          <FormLabel className="text-base">
+                            Cuisine Type
+                          </FormLabel>
+                          <FormControl>
+                            <FilterSelector
+                              title="Select Cuisine Type"
+                              options={cuisineTypeOptions}
+                              onChange={(value: string | undefined) => {
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  name="mealType"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      {/* <FormLabel></FormLabel> */}
-                      <FormControl>
-                        <FilterSelector
-                          title="Meal Type"
-                          options={mealTypeOptions}
-                          onChange={(value: string | undefined) => {
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      name="mealType"
+                      control={control}
+                      render={({ field }) => (
+                        <FormItem className="w-full md:w-1/2">
+                          <FormLabel className="text-base">Meal Type</FormLabel>
+                          <FormControl>
+                            <FilterSelector
+                              title="Select Meal Type"
+                              options={mealTypeOptions}
+                              onChange={(value: string | undefined) => {
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
 
-                <FormField
-                  name="time"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      <FormLabel>
-                        Time <span>{field.value ?? 0} min</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          value={[field.value ?? 0]}
-                          onValueChange={(v) => field.onChange(v[0])}
-                          defaultValue={[field.value as number]}
-                          max={360}
-                          step={1}
-                          className="max-w-[40%] md:max-w-none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Nutritional Info */}
+                <div className="space-y-2">
+                  <FormLabel className="font-bold text-lg">
+                    Nutritional Info
+                  </FormLabel>
+                  <FormField
+                    name="calories"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Calories <span>{field.value ?? 0} kcal</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Slider
+                            value={[field.value ?? 0]}
+                            onValueChange={(v) => field.onChange(v[0])}
+                            defaultValue={[field.value as number]}
+                            max={5000}
+                            step={10}
+                            className="max-w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  name="calories"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      <FormLabel>
-                        Calories <span>{field.value ?? 0} kcal</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          value={[field.value ?? 0]}
-                          onValueChange={(v) => field.onChange(v[0])}
-                          defaultValue={[field.value as number]}
-                          max={5000}
-                          step={10}
-                          className="max-w-[40%] md:max-w-none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    name="procnt"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Protein <span>{field.value ?? 0} g</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Slider
+                            value={[field.value ?? 0]}
+                            onValueChange={(v) => field.onChange(v[0])}
+                            defaultValue={[field.value as number]}
+                            max={5000}
+                            step={10}
+                            className="max-w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  name="procnt"
-                  control={control}
-                  render={({ field }: any) => (
-                    <FormItem>
-                      <FormLabel>
-                        Protein <span>{field.value ?? 0} g</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          value={[field.value ?? 0]}
-                          onValueChange={(v) => field.onChange(v[0])}
-                          defaultValue={[field.value as number]}
-                          max={5000}
-                          step={10}
-                          className="max-w-[40%] md:max-w-none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    name="fat"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Fat <span>{field.value ?? 0} g</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Slider
+                            value={[field.value ?? 0]}
+                            onValueChange={(v) => field.onChange(v[0])}
+                            defaultValue={[field.value as number]}
+                            max={100}
+                            step={1}
+                            className="max-w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  name="fat"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Fat <span>{field.value ?? 0} g</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          value={[field.value ?? 0]}
-                          onValueChange={(v) => field.onChange(v[0])}
-                          defaultValue={[field.value as number]}
-                          max={100}
-                          step={1}
-                          className="max-w-[40%] md:max-w-none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    name="chocdf"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Carbohydrates <span>{field.value ?? 0} g</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Slider
+                            value={[field.value ?? 0]}
+                            onValueChange={(v) => field.onChange(v[0])}
+                            defaultValue={[field.value as number]}
+                            max={500}
+                            step={1}
+                            className="max-w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  name="chocdf"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Carbohydrates <span>{field.value ?? 0} g</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          value={[field.value ?? 0]}
-                          onValueChange={(v) => field.onChange(v[0])}
-                          defaultValue={[field.value as number]}
-                          max={500}
-                          step={1}
-                          className="max-w-[40%] md:max-w-none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    name="sugar"
+                    control={control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Sugar <span>{field.value ?? 0}</span> g
+                        </FormLabel>
+                        <FormControl>
+                          <Slider
+                            value={[field.value ?? 0]}
+                            onValueChange={(v) => field.onChange(v[0])}
+                            defaultValue={[field.value as number]}
+                            max={100}
+                            step={1}
+                            className="max-w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                <FormField
-                  name="sugar"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Sugar <span>{field.value ?? 0}</span> g
-                      </FormLabel>
-                      <FormControl>
-                        <Slider
-                          value={[field.value ?? 0]}
-                          onValueChange={(v) => field.onChange(v[0])}
-                          defaultValue={[field.value as number]}
-                          max={100}
-                          step={1}
-                          className="max-w-[40%] md:max-w-none"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+                {/* Submit Button */}
                 <section className="flex items-center justify-center">
-                  <Button className="bg-gray-500 mt-2" type="submit">
+                  <Button className="bg-gray-500 mt-4 w-full" type="submit">
                     Search
                   </Button>
                 </section>
