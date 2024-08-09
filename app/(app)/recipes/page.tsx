@@ -98,7 +98,7 @@ const mealTypeOptions: string[] = [
   "Teatime",
 ];
 
-const POLLING_FREQUENCY_MS = 1000;
+// const POLLING_FREQUENCY_MS = 1000;
 const API_URL = process.env.NEXT_PUBLIC_BASE_URL_EDAMAM;
 const APP_ID = process.env.NEXT_PUBLIC_APP_ID_EDAMAM;
 const APP_KEY = process.env.NEXT_PUBLIC_APP_KEY_EDAMAM;
@@ -119,9 +119,9 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-interface RecipesProps {
-  recipe: any;
-}
+// interface RecipesProps {
+//   recipe: any;
+// }
 
 function Recipes() {
   // Atom State
@@ -136,8 +136,8 @@ function Recipes() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       query: "",
-      diet: [""],
-      health: [""],
+      diet: [],
+      health: [],
       cuisineType: undefined,
       mealType: undefined,
       time: 0,
@@ -151,7 +151,7 @@ function Recipes() {
 
   const { watch, setValue, handleSubmit, control } = form;
 
-  const watchAllFields = watch();
+  // const watchAllFields = watch();
 
   // const URL = `${API_URL}?app_id=${APP_ID}&app_key=${APP_KEY}&q=${query}&type=public`;
 
@@ -177,8 +177,7 @@ function Recipes() {
       };
 
       const nutrients = {
-        ENERC_KCAL: data?.calories > 0 ? `${data.calories}` : undefined,
-        // ENERC_KCAL: data.calories > 0 ? `0-${data.calories}` : undefined,
+        ENERC_KCAL: data.calories > 0 ? `${data.calories}` : undefined,
         PROCNT: data?.procnt > 0 ? `${data.procnt}` : undefined,
         FAT: data.fat > 0 ? `${data.fat}` : undefined,
         CHOCDF: data.chocdf > 0 ? `${data.chocdf}` : undefined,
@@ -216,7 +215,14 @@ function Recipes() {
           return;
         }
 
-        setRecipes(hits.map((hit: any) => hit.recipe));
+        const response = hits.map((hit: any) => hit.recipe);
+
+        const filteredRecipes = response.filter((recipe: any) => {
+          const calories = recipe.calories ? recipe.calories : 0;
+          return !data.calories || calories <= data.calories;
+        });
+
+        setRecipes(filteredRecipes);
       } catch (error) {
         console.error(error);
         setRecipes([]);
@@ -256,7 +262,7 @@ function Recipes() {
                         <FormControl>
                           <Input
                             className="rounded-md border-gray-300 text-"
-                            placeholder="e.g., Pancake, Cake, Vegan, Chicken"
+                            placeholder="e.g., Pancake, Chicken, pasta"
                             inputMode="text"
                             {...field}
                           />
@@ -393,7 +399,7 @@ function Recipes() {
                     )}
                   />
 
-                  <FormField
+                  {/* <FormField
                     name="procnt"
                     control={control}
                     render={({ field }) => (
@@ -414,9 +420,9 @@ function Recipes() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
-                  <FormField
+                  {/* <FormField
                     name="fat"
                     control={control}
                     render={({ field }) => (
@@ -437,8 +443,8 @@ function Recipes() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-
+                  /> */}
+                  {/* 
                   <FormField
                     name="chocdf"
                     control={control}
@@ -460,8 +466,8 @@ function Recipes() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-
+                  /> */}
+                  {/* 
                   <FormField
                     name="sugar"
                     control={control}
@@ -483,7 +489,7 @@ function Recipes() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                 </div>
 
                 {/* Submit Button */}
@@ -501,7 +507,8 @@ function Recipes() {
         {fetching ? (
           <section className="md:w-3/4 2xl:pl-10 mt-20 md:mt-0">
             <p className="flex gap-2 text-center">
-              <LoaderCircleIcon className="animate-spin" /> Loading Recipes...
+              <LoaderCircleIcon className=" w-8 h-8 animate-spin" /> Loading
+              Recipes...
             </p>
           </section>
         ) : recipes?.length > 0 ? (
