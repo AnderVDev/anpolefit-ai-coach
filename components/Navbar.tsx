@@ -10,10 +10,10 @@ const routes = [
     name: "Chat",
     path: "/",
   },
-  {
-    name: "Calculator",
-    path: "/calculator",
-  },
+  // {
+  //   name: "Calculator",
+  //   path: "/calculator",
+  // },
   {
     name: "Recipes",
     path: "/recipes",
