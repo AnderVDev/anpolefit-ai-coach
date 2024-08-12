@@ -10,24 +10,28 @@ export const metadata: Metadata = {
 const sidebarNavItems = [
   {
     title: "Profiles",
-    href: "/form",
+    href: "/profile",
   },
   {
     title: "Account",
-    href: "/form/account",
+    href: "/profile/account",
   },
+  // {
+  //   title: "Appearance",
+  //   href: "/profile/appearance",
+  // },
   {
-    title: "Appearance",
-    href: "/form/appearance",
+    title: "Calculator",
+    href: "/profile/calculator",
   },
   {
     title: "Notifications",
-    href: "/form/notifications",
+    href: "/profile/notifications",
   },
-  {
-    title: "Display",
-    href: "/form/display",
-  },
+  // {
+  //   title: "Display",
+  //   href: "/profile/display",
+  // },
 ];
 
 interface SettingsLayoutProps {

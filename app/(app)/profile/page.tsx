@@ -1,33 +1,17 @@
-import ProfileContainer from "@/components/ProfileContainer";
-import { prismadb } from "@/lib/prismadb";
-import { currentUser } from "@clerk/nextjs/server";
-import React from "react";
+import { Separator } from "@/components/ui/separator";
+import { ProfileForm } from "./profile-form";
 
-export default async function ProfilePage() {
-  const user = await currentUser();
-
-  if (!user) {
-    throw new Error("No user");
-  }
-
-  let challengePreferences = await prismadb.challengePreferences.findUnique({
-    where: {
-      userId: user.id,
-    },
-  });
-
-  if (!challengePreferences) {
-    challengePreferences = await prismadb.challengePreferences.create({
-      data: {
-        userId: user.id,
-        challengeId: "EASY",
-      },
-    });
-  }
-
+export default function SettingsProfilePage() {
   return (
-    <div className="max-w-screen-lg m-10 lg:mx-auto">
-      <ProfileContainer challengePreferences={challengePreferences} />
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Profile</h3>
+        <p className="text-sm text-muted-foreground">
+          This is how others will see you on the site.
+        </p>
+      </div>
+      <Separator />
+      <ProfileForm />
     </div>
   );
 }

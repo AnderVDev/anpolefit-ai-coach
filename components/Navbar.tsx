@@ -22,10 +22,6 @@ const routes = [
     name: "Profile",
     path: "/profile",
   },
-  {
-    name: "Form",
-    path: "/form",
-  },
 ];
 
 function Navbar() {

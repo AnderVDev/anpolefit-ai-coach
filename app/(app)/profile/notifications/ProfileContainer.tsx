@@ -2,11 +2,12 @@
 
 import { ChallengePreferences } from "@prisma/client";
 import React, { useState } from "react";
-import { Button } from "./ui/button";
-import { Switch } from "./ui/switch";
-import DifficultyCard from "./DifficultyCard";
+
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import DifficultyCard from "@/components/DifficultyCard";
 
 
 const difficulties = [
