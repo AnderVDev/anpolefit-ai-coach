@@ -550,12 +550,12 @@ function Recipes() {
           </section>
         )}
       </section>
-      <PaginationComponent
+      {/* <PaginationComponent
         totalPages={totalPages}
         itemsPerPage={recipesPerPage}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
-      />
+      /> */}
     </>
   );
 }
