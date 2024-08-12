@@ -14,6 +14,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import PaginationComponent from "@/components/PaginationComponent";
 import {
   Form,
   FormControl,
@@ -130,7 +131,11 @@ function Recipes() {
   // State
   const [recipes, setRecipes] = useState([]);
   const [fetching, setFetching] = useState(false);
-  // const [query, setQuery] = useState("Chicken");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [nextLink, setNextLink] = useState("");
+  const [recipesPerPage, setRecipesPerPage] = useState(20);
+
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -156,7 +161,7 @@ function Recipes() {
   // const URL = `${API_URL}?app_id=${APP_ID}&app_key=${APP_KEY}&q=${query}&type=public`;
 
   const fetchRecipes = useCallback(
-    async (data: FormSchema) => {
+    async (dataForm: FormSchema) => {
       if (!userThread?.id) return;
 
       setFetching(true);
@@ -165,24 +170,28 @@ function Recipes() {
         type: "public",
         app_id: APP_ID,
         app_key: APP_KEY,
-        q: data.query,
+        q: dataForm.query,
         diet:
-          data.diet.length > 0 && data.diet[0] !== "" ? data.diet : undefined,
-        health:
-          data.health.length > 0 && data.health[0] !== ""
-            ? data.health
+          dataForm.diet.length > 0 && dataForm.diet[0] !== ""
+            ? dataForm.diet
             : undefined,
-        cuisineType: data.cuisineType ? data.cuisineType : undefined,
-        mealType: data.mealType ? data.mealType : undefined,
+        health:
+          dataForm.health.length > 0 && dataForm.health[0] !== ""
+            ? dataForm.health
+            : undefined,
+        cuisineType: dataForm.cuisineType ? dataForm.cuisineType : undefined,
+        mealType: dataForm.mealType ? dataForm.mealType : undefined,
       };
+      // console.log("params", params);
 
       const nutrients = {
-        ENERC_KCAL: data.calories > 0 ? `${data.calories}` : undefined,
-        PROCNT: data?.procnt > 0 ? `${data.procnt}` : undefined,
-        FAT: data.fat > 0 ? `${data.fat}` : undefined,
-        CHOCDF: data.chocdf > 0 ? `${data.chocdf}` : undefined,
-        SUGAR: data.sugar > 0 ? `${data.sugar}` : undefined,
+        ENERC_KCAL: dataForm.calories > 0 ? `${dataForm.calories}` : undefined,
+        PROCNT: dataForm?.procnt > 0 ? `${dataForm.procnt}` : undefined,
+        FAT: dataForm.fat > 0 ? `${dataForm.fat}` : undefined,
+        CHOCDF: dataForm.chocdf > 0 ? `${dataForm.chocdf}` : undefined,
+        SUGAR: dataForm.sugar > 0 ? `${dataForm.sugar}` : undefined,
       };
+      // console.log("nutrients", nutrients);
 
       const searchParams = new URLSearchParams();
 
@@ -203,7 +212,7 @@ function Recipes() {
       });
 
       const URL = `${API_URL}?${searchParams.toString()}`;
-      console.log("URL", URL);
+      // console.log("URL", URL);
 
       try {
         const { data } = await axios.get(URL);
@@ -215,12 +224,24 @@ function Recipes() {
           return;
         }
 
-        const response = hits.map((hit: any) => hit.recipe);
+        setTotalPages(Math.ceil(data.count / 20));
+        setNextLink(data._links.next?.href);
 
-        const filteredRecipes = response.filter((recipe: any) => {
-          const calories = recipe.calories ? recipe.calories : 0;
-          return !data.calories || calories <= data.calories;
-        });
+        const response = hits.map((hit: any) => hit.recipe);
+        // console.log("response", response);
+
+        let filteredRecipes = [];
+        // let filteredRecipes = response;
+
+        console.log("nutrients.ENERC_KCAL", nutrients.ENERC_KCAL);
+        if (nutrients.ENERC_KCAL) {
+          filteredRecipes = response.filter((recipe: any) => {
+            return recipe.calories <= nutrients.ENERC_KCAL;
+          });
+        } else {
+          filteredRecipes = response;
+        }
+        // console.log("filteredRecipes", filteredRecipes);
 
         setRecipes(filteredRecipes);
       } catch (error) {
@@ -233,9 +254,15 @@ function Recipes() {
     [userThread?.id]
   );
 
-  const onSubmit: SubmitHandler<FormSchema> = (data) => {
-    console.log("data", data);
-    fetchRecipes(data);
+  useEffect(() => {
+    if (currentPage > 0) {
+      fetchRecipes(form.getValues()); // Fetch based on form values
+    }
+  }, [currentPage, fetchRecipes, form]);
+
+  const onSubmit: SubmitHandler<FormSchema> = (dataForm) => {
+    // console.log("dataForm", dataForm);
+    fetchRecipes(dataForm);
   };
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -523,6 +550,12 @@ function Recipes() {
           </section>
         )}
       </section>
+      <PaginationComponent
+        totalPages={totalPages}
+        itemsPerPage={recipesPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </>
   );
 }
