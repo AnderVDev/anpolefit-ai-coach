@@ -4,7 +4,8 @@ import { assistantAtom, userThreadAtom } from "@/atoms";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useAtom } from "jotai";
-import { Run, ThreadMessage } from "openai/resources/beta/threads/index.mjs";
+import { Run } from "openai/resources/beta/threads/index.mjs";
+// import { Run, ThreadMessage } from "openai/resources/beta/threads/index.mjs";
 import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -17,7 +18,7 @@ function ChatPage() {
 
   // State
   const [fetching, setFetching] = useState(false);
-  const [messages, setMessages] = useState<ThreadMessage[]>([]);
+  const [messages, setMessages] = useState<any>([]);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [pollingRun, setPollingRun] = useState(false);
@@ -31,7 +32,7 @@ function ChatPage() {
       const response = await axios.post<{
         success: boolean;
         error?: string;
-        messages?: ThreadMessage[];
+        messages?: any;
       }>("/api/message/list", { threadId: userThread.threadId });
 
       // Validation
@@ -164,7 +165,7 @@ function ChatPage() {
         data: { message: newMessages },
       } = await axios.post<{
         success: boolean;
-        message?: ThreadMessage;
+        message?: any;
         error?: string;
       }>("/api/message/create", {
         message,
@@ -179,7 +180,7 @@ function ChatPage() {
         return;
       }
 
-      setMessages((prev) => [...prev, newMessages]);
+      setMessages((prev: any) => [...prev, newMessages]);
       setMessage("");
       toast.success("Message sent.");
       // Start a run and then we are going to start polling.
