@@ -45,13 +45,13 @@ function ChatPage() {
 
       // Sort in descending order
       newMessages = newMessages
-        .sort((a, b) => {
+        .sort((a: any, b: any) => {
           return (
             new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
           );
         })
         .filter(
-          (message) =>
+          (message: any) =>
             message.content[0].type === "text" &&
             message.content[0].text.value.trim() !== ""
         );
@@ -211,7 +211,7 @@ function ChatPage() {
           <div className="text-center font-bold">No messages.</div>
         )}
         {/* 3. LISTING OUT THE MESSAGES */}
-        {messages.map((message) => (
+        {messages.map((message: any) => (
           <div
             key={message.id}
             className={`px-4 py-2 mb-3 rounded-lg w-fit text-sm  ${

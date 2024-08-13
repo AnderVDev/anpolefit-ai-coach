@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "./ui/card";
 import Image from "next/image";
 
-function NutritionFactsCard({ recipeValues }) {
+function NutritionFactsCard({ recipeValues }: any) {
   const { image, images, totalNutrients } = recipeValues;
   console.log("NutritionFactsCard", recipeValues);
   return (
