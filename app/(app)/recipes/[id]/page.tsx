@@ -27,7 +27,7 @@ function RecipeDetails() {
   const [userThread] = useAtom(userThreadAtom);
 
   //states
-  const [recipeById, setRecipeById] = useState(null);
+  const [recipeById, setRecipeById] = useState<any>(null);
   // const [recipes, setRecipes] = useState([]);
   const [fetching, setFetching] = useState(false);
 
@@ -122,7 +122,7 @@ function RecipeDetails() {
             <div className="md:w-2/4 md:border-r border-gray-500 pr-1">
               <div className="flex flex-col gap-5">
                 <p className="text-2xl underline">Ingredients</p>
-                {recipeById?.ingredientLines?.map((ingredient, index) => (
+                {recipeById?.ingredientLines?.map((ingredient: any, index: any) => (
                   <p key={index} className="flex gap-2">
                     {ingredient}
                   </p>
@@ -140,7 +140,7 @@ function RecipeDetails() {
           <section className="flex flex-col items-center justify-center gap-3 md:w-[640px]">
             <p className="text-2xl underline">Health Labels</p>
             <div className="flex flex-wrap gap-4">
-              {recipeById.healthLabels.map((item, index) => (
+              {recipeById.healthLabels.map((item: any, index: any) => (
                 <p
                   className="text-gray-20 flex gap-2 bg-gray-500 px-4 py-1 rounded-full"
                   key={index}

@@ -172,24 +172,25 @@ function Recipes() {
         app_key: APP_KEY,
         q: dataForm.query,
         diet:
-          dataForm.diet.length > 0 && dataForm.diet[0] !== ""
+          dataForm.diet!.length > 0 && dataForm.diet![0] !== ""
             ? dataForm.diet
             : undefined,
         health:
-          dataForm.health.length > 0 && dataForm.health[0] !== ""
+          dataForm.health!.length > 0 && dataForm.health![0] !== ""
             ? dataForm.health
             : undefined,
-        cuisineType: dataForm.cuisineType ? dataForm.cuisineType : undefined,
-        mealType: dataForm.mealType ? dataForm.mealType : undefined,
+        cuisineType: dataForm.cuisineType ?? undefined,
+        mealType: dataForm.mealType ?? undefined,
+        // mealType: dataForm.mealType ? dataForm.mealType : undefined,
       };
       // console.log("params", params);
 
       const nutrients = {
-        ENERC_KCAL: dataForm.calories > 0 ? `${dataForm.calories}` : undefined,
-        PROCNT: dataForm?.procnt > 0 ? `${dataForm.procnt}` : undefined,
-        FAT: dataForm.fat > 0 ? `${dataForm.fat}` : undefined,
-        CHOCDF: dataForm.chocdf > 0 ? `${dataForm.chocdf}` : undefined,
-        SUGAR: dataForm.sugar > 0 ? `${dataForm.sugar}` : undefined,
+        ENERC_KCAL: dataForm.calories! > 0 ? `${dataForm.calories}` : undefined,
+        PROCNT: dataForm.procnt! > 0 ? `${dataForm.procnt}` : undefined,
+        FAT: dataForm.fat! > 0 ? `${dataForm.fat}` : undefined,
+        CHOCDF: dataForm.chocdf! > 0 ? `${dataForm.chocdf}` : undefined,
+        SUGAR: dataForm.sugar! > 0 ? `${dataForm.sugar}` : undefined,
       };
       // console.log("nutrients", nutrients);
 
@@ -236,7 +237,7 @@ function Recipes() {
         console.log("nutrients.ENERC_KCAL", nutrients.ENERC_KCAL);
         if (nutrients.ENERC_KCAL) {
           filteredRecipes = response.filter((recipe: any) => {
-            return recipe.calories <= nutrients.ENERC_KCAL;
+            return recipe.calories <= nutrients.ENERC_KCAL!;
           });
         } else {
           filteredRecipes = response;
